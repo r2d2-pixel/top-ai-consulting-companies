@@ -1,0 +1,445 @@
+---
+import Base from '../../layouts/Base.astro';
+import StarRating from '../../components/StarRating.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { companies, getComparisons } from '../../data/companies';
+import type { Company } from '../../data/companies';
+import { SITE, NICHE } from '../../config';
+import { SERVICE_LABELS, isUndisclosedMinimum } from '../../lib/companies';
+
+export function getStaticPaths() {
+  return companies.map(c => ({ params: { slug: c.slug }, props: { company: c } }));
+}
+
+interface Props { company: Company }
+const { company } = Astro.props;
+
+// Free-text fields (bestFor, primaryDifferentiator, etc.) sometimes already end
+// in a period; strip it before splicing into a sentence that adds its own "."
+// so we never render "..". Also preserves acronym casing (SaaS, EU, CTOs) when
+// lowercasing the first word, matching the homepage's existing logic.
+const stripTrailingPeriods = (s: string) => s.replace(/\.+$/, '');
+// Truncate to n words with an ellipsis, but only append "..." when truncation
+// actually happened — otherwise a short bestFor that already ends in "." would
+// render as "....". Untruncated strings get exactly one trailing period.
+function truncateWords(s: string, n: number): string {
+  const clean = stripTrailingPeriods(s);
+  const words = clean.split(' ');
+  return words.length > n ? words.slice(0, n).join(' ') + '...' : clean + '.';
+}
+
+const others = companies.filter(c => c.slug !== company.slug);
+const allComparisons = getComparisons();
+const myComparisons = allComparisons.filter(
+  c => c.slug1 === company.slug || c.slug2 === company.slug
+);
+
+const canonical = `${SITE.url}/companies/${company.slug}/`;
+const pageTitle = `${company.name} review ${new Date().getFullYear()}`;
+const pageDesc = `Independent review of ${company.name}: services, pricing, tech stack, pros and cons, and who it is best for.`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: company.name, item: canonical },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': ['Organization', 'ProfessionalService'],
+    name: company.name,
+    url: company.website,
+    foundingDate: String(company.founded),
+    description: company.description,
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: String(company.rating),
+      bestRating: '5',
+      worstRating: '1',
+      ratingCount: 1,
+    },
+  },
+];
+---
+
+<Base title={pageTitle} description={pageDesc} canonical={canonical}>
+  <JsonLd schema={jsonLd} slot="head" />
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Breadcrumb -->
+    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
+      <a href="/" class="hover:text-brand-600">Home</a>
+      <span>›</span>
+      <a href="/#comparison-table" class="hover:text-brand-600">Companies</a>
+      <span>›</span>
+      <span class="text-slate-600">{company.name}</span>
+    </nav>
+
+    <!-- Company header -->
+    <div class="border border-slate-200 rounded-xl p-6 mb-6">
+      <div class="flex items-start justify-between flex-wrap gap-4 mb-4">
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <h1 class="text-3xl font-bold text-slate-900">{company.name}</h1>
+            {company.featured && <span class="text-sm bg-brand-600 text-white px-3 py-1 rounded-full">Editor's pick #1</span>}
+          </div>
+          <p class="text-slate-500 italic mb-3">{company.tagline}</p>
+          <div class="flex flex-wrap gap-4 text-sm text-slate-600">
+            <span>Founded {company.founded}</span>
+            <span>|</span>
+            <span>{company.hq}</span>
+            <span>|</span>
+            <span>{company.teamSize} employees</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="flex items-center gap-2 mb-3">
+            <StarRating rating={company.rating} />
+            <span class="text-2xl font-bold text-slate-900">{company.rating.toFixed(1)}</span>
+            <span class="text-slate-400 text-sm">/ 5</span>
+          </div>
+          <a
+            href={company.website}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            class="inline-block bg-brand-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-700 transition-colors text-sm"
+          >
+            Visit website
+          </a>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="flex flex-wrap gap-2">
+        {company.badges.map(b => (
+          <span class="text-xs bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-1 rounded-full font-medium">{b}</span>
+        ))}
+      </div>
+    </div>
+
+    <!-- Quick nav tabs -->
+    <div class="flex gap-1 overflow-x-auto mb-8 border-b border-slate-200 pb-0">
+      {[
+        { label: 'Overview', href: '#overview' },
+        { label: 'Tech stack', href: '#tech-stack' },
+        { label: 'Pricing', href: '#pricing' },
+        { label: 'Pros & cons', href: '#pros-cons' },
+        { label: 'Alternatives', href: '#alternatives' },
+        { label: 'FAQ', href: '#faq' },
+      ].map(t => (
+        <a href={t.href} class="text-sm font-medium text-slate-600 px-4 py-2.5 whitespace-nowrap hover:text-brand-600 border-b-2 border-transparent hover:border-brand-600 transition-colors">
+          {t.label}
+        </a>
+      ))}
+    </div>
+
+    <div class="lg:grid lg:grid-cols-3 lg:gap-10">
+
+      <!-- MAIN CONTENT -->
+      <div class="lg:col-span-2">
+
+        <!-- Overview -->
+        <section id="overview" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">What is {company.name}?</h2>
+          <p class="text-slate-700 leading-relaxed mb-4">{company.description}</p>
+          <p class="text-slate-700 leading-relaxed">
+            {company.name} works primarily with clients in {company.industries.join(', ')} sectors.
+            Its primary differentiator is: {stripTrailingPeriods(company.primaryDifferentiator)}.
+          </p>
+        </section>
+
+        <!-- Tech stack -->
+        <section id="tech-stack" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} tech stack and services</h2>
+          <div class="flex flex-wrap gap-2 mb-6">
+            {company.techStack.map(t => (
+              <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1 rounded-full">{t}</span>
+            ))}
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200">
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Service area</th>
+                </tr>
+              </thead>
+              <tbody>
+                {company.badges.map((b, i) => (
+                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
+                    <td class="px-4 py-3 font-medium text-slate-800">{SERVICE_LABELS[b] ?? b}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="pricing" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} pricing</h2>
+          <p class="text-slate-600 mb-4 text-sm">
+            Short answer: {company.name} uses a {company.pricingModel.toLowerCase()} pricing approach.
+            {!isUndisclosedMinimum(company.minimumEngagement)
+              ? `Minimum engagement starts at ${company.minimumEngagement}.`
+              : 'Minimum engagement is not publicly disclosed; a discovery call is required.'}
+          </p>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 mb-4">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200">
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Engagement model</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Typical range</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
+                </tr>
+              </thead>
+              <tbody>
+                {company.engagementModels.map((m, i) => (
+                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
+                    <td class="px-4 py-3 font-medium text-slate-800">{m}</td>
+                    <td class="px-4 py-3 text-slate-600">
+                      {m.toLowerCase().includes('fixed') ? `From ${!isUndisclosedMinimum(company.minimumEngagement) ? company.minimumEngagement : 'not disclosed'}` :
+                       m.toLowerCase().includes('retainer') ? 'Monthly rate; not public' :
+                       'Variable; depends on team size'}
+                    </td>
+                    <td class="px-4 py-3 text-slate-600">
+                      {m.toLowerCase().includes('fixed') ? 'Well-defined scope' :
+                       m.toLowerCase().includes('retainer') ? 'Ongoing AI engineering' :
+                       'Large programmes or team augmentation'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+            {company.name} does not publish a public rate card. Contact them directly via their website to get project-specific pricing.
+          </div>
+        </section>
+
+        <!-- Pros and cons -->
+        <section id="pros-cons" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} pros and cons</h2>
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200">
+                  <th class="text-left px-4 py-3 font-semibold text-green-700 w-1/2">Advantages</th>
+                  <th class="text-left px-4 py-3 font-semibold text-red-600 w-1/2">Things to consider</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: Math.max(company.pros.length, company.cons.length) }, (_, i) => (
+                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
+                    <td class="px-4 py-3 text-slate-700 align-top">
+                      {company.pros[i] && <span class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5 shrink-0">+</span>{company.pros[i]}</span>}
+                    </td>
+                    <td class="px-4 py-3 text-slate-700 align-top">
+                      {company.cons[i] && <span class="flex items-start gap-2"><span class="text-red-400 font-bold mt-0.5 shrink-0">-</span>{company.cons[i]}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Alternatives comparison -->
+        <section id="alternatives" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} vs alternatives</h2>
+          <p class="text-slate-600 mb-4 text-sm">How {company.name} compares to the other top {NICHE.label} {NICHE.providersLabel}.</p>
+          <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200">
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Key difference</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Rating</th>
+                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Compare</th>
+                </tr>
+              </thead>
+              <tbody>
+                {others.map((alt, i) => {
+                  const compSlug = myComparisons.find(
+                    c => (c.slug1 === company.slug && c.slug2 === alt.slug) ||
+                         (c.slug2 === company.slug && c.slug1 === alt.slug)
+                  )?.slug;
+                  return (
+                    <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+                      <td class="px-4 py-3 font-medium">
+                        <a href={`/companies/${alt.slug}/`} class="text-brand-600 hover:underline">{alt.name}</a>
+                      </td>
+                      <td class="px-4 py-3 text-slate-600 text-xs">{truncateWords(alt.bestFor, 8)}</td>
+                      <td class="px-4 py-3 text-slate-600 text-xs">{alt.primaryDifferentiator}</td>
+                      <td class="px-4 py-3 text-slate-700 font-semibold">{alt.rating.toFixed(1)}</td>
+                      <td class="px-4 py-3">
+                        {compSlug && (
+                          <a href={`/comparisons/${compSlug}/`} class="text-xs text-brand-600 hover:underline whitespace-nowrap">
+                            Full comparison
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4">
+            <a href={`/alternatives/${company.slug}/`} class="text-sm font-semibold text-brand-600 hover:underline">
+              See all {company.name} alternatives
+            </a>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-6">{company.name} FAQ</h2>
+          <div class="space-y-5">
+            <div class="border-b border-slate-100 pb-5">
+              <h3 class="font-semibold text-slate-900 mb-2">What is {company.name}?</h3>
+              <p class="text-sm text-slate-600">{company.tagline}</p>
+            </div>
+            <div class="border-b border-slate-100 pb-5">
+              <h3 class="font-semibold text-slate-900 mb-2">How much does {company.name} charge?</h3>
+              <p class="text-sm text-slate-600">
+                {company.name} uses {company.pricingModel.toLowerCase()} pricing.
+                {!isUndisclosedMinimum(company.minimumEngagement)
+                  ? `Minimum engagement starts at ${company.minimumEngagement}. `
+                  : 'Minimum engagement is not publicly disclosed. '}
+                A discovery call is required to get project-specific quotes.
+              </p>
+            </div>
+            <div class="border-b border-slate-100 pb-5">
+              <h3 class="font-semibold text-slate-900 mb-2">What tech stack does {company.name} use?</h3>
+              <p class="text-sm text-slate-600">
+                {company.name} works with {company.techStack.join(', ')}.
+                Primary industries served include {company.industries.join(', ')}.
+              </p>
+            </div>
+            <div class="border-b border-slate-100 pb-5">
+              <h3 class="font-semibold text-slate-900 mb-2">Is {company.name} right for enterprise?</h3>
+              <p class="text-sm text-slate-600">
+                {stripTrailingPeriods(company.bestFor)}. {company.teamSize} team size.
+                {company.cons[0] ? `Key consideration: ${stripTrailingPeriods(company.cons[0])}.` : ''}
+              </p>
+            </div>
+            <div class="pb-5">
+              <h3 class="font-semibold text-slate-900 mb-2">What are the best {company.name} alternatives?</h3>
+              <p class="text-sm text-slate-600 mb-2">
+                The best alternatives to {company.name} depend on your use case. Top options are:
+              </p>
+              <ul class="text-sm text-slate-600 space-y-1">
+                {others.slice(0, 3).map(alt => (
+                  <li><a href={`/companies/${alt.slug}/`} class="text-brand-600 hover:underline">{alt.name}</a>: {alt.primaryDifferentiator.toLowerCase()}</li>
+                ))}
+              </ul>
+              <a href={`/alternatives/${company.slug}/`} class="mt-2 inline-block text-sm text-brand-600 hover:underline">See full alternatives list</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Related comparisons -->
+        <section class="mb-10">
+          <h2 class="text-xl font-bold text-slate-900 mb-4">Compare {company.name} with other {NICHE.label} {NICHE.providersLabel}</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {myComparisons.map(c => {
+              const other = c.slug1 === company.slug
+                ? companies.find(co => co.slug === c.slug2)!
+                : companies.find(co => co.slug === c.slug1)!;
+              return (
+                <a href={`/comparisons/${c.slug}/`} class="border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-colors">
+                  {company.name} vs {other.name}
+                </a>
+              );
+            })}
+          </div>
+        </section>
+
+        <p class="text-xs text-slate-400 border-t border-slate-100 pt-4 mt-6">
+          Verify all details directly with {company.name} before making a decision.
+        </p>
+      </div>
+
+      <!-- SIDEBAR -->
+      <aside class="lg:col-span-1 mb-8 lg:mb-0 order-first lg:order-last">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 sticky top-20">
+          <div class="text-center mb-4">
+            <div class="w-16 h-16 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xl mx-auto mb-2">
+              {company.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+            </div>
+            <p class="font-bold text-slate-900">{company.name}</p>
+            <p class="text-xs text-slate-500">{company.hq}</p>
+          </div>
+
+          <div class="flex items-center justify-center gap-2 mb-5 pb-4 border-b border-slate-100">
+            <StarRating rating={company.rating} />
+            <span class="font-bold text-slate-900">{company.rating.toFixed(1)}</span>
+            <span class="text-xs text-slate-400">/ 5</span>
+          </div>
+
+          <dl class="space-y-3 text-sm mb-5">
+            <div>
+              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Best for</dt>
+              <dd class="text-slate-700 text-xs leading-relaxed">{company.bestFor}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Pricing</dt>
+              <dd class="text-slate-700 text-xs">{company.pricingModel}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Min. engagement</dt>
+              <dd class="text-slate-700 text-xs">{company.minimumEngagement}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Founded</dt>
+              <dd class="text-slate-700 text-xs">{company.founded}</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Team size</dt>
+              <dd class="text-slate-700 text-xs">{company.teamSize}</dd>
+            </div>
+          </dl>
+
+          <div class="mb-4">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Key capabilities</p>
+            <div class="flex flex-wrap gap-1.5">
+              {company.badges.map(b => (
+                <span class="text-xs bg-brand-50 text-brand-700 border border-brand-100 px-2 py-0.5 rounded font-medium">{b}</span>
+              ))}
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tech stack</p>
+            <div class="flex flex-wrap gap-1.5">
+              {company.techStack.slice(0, 5).map(t => (
+                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{t}</span>
+              ))}
+            </div>
+          </div>
+
+          <a
+            href={company.website}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            class="block w-full text-center bg-brand-600 text-white font-semibold py-2.5 rounded-lg hover:bg-brand-700 transition-colors text-sm mb-3"
+          >
+            Visit {company.name}
+          </a>
+          <a
+            href={`/alternatives/${company.slug}/`}
+            class="block w-full text-center border border-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors text-sm"
+          >
+            See alternatives
+          </a>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</Base>

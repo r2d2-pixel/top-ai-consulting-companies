@@ -1,0 +1,34 @@
+---
+interface Props {
+  rating: number; // 0–5, supports .5 increments
+}
+const { rating } = Astro.props;
+
+const uid = Math.random().toString(36).slice(2, 8);
+const PATH = 'M10 1l2.39 4.847 5.348.777-3.869 3.77.913 5.32L10 13.347l-4.782 2.367.913-5.32-3.87-3.77 5.35-.777z';
+
+const stars = [1, 2, 3, 4, 5].map(n => {
+  if (rating >= n) return 'full';
+  if (rating >= n - 0.5) return 'half';
+  return 'empty';
+});
+---
+<div class="flex gap-0.5" role="img" aria-label={`${rating} out of 5 stars`}>
+  {stars.map((type, i) => (
+    <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg">
+      {type === 'full'  && <path d={PATH} fill="#FBBF24" />}
+      {type === 'empty' && <path d={PATH} fill="#E2E8F0" />}
+      {type === 'half'  && (
+        <>
+          <defs>
+            <clipPath id={`h-${uid}-${i}`}>
+              <rect x="0" y="0" width="10" height="18" />
+            </clipPath>
+          </defs>
+          <path d={PATH} fill="#E2E8F0" />
+          <path d={PATH} fill="#FBBF24" clip-path={`url(#h-${uid}-${i})`} />
+        </>
+      )}
+    </svg>
+  ))}
+</div>

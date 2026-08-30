@@ -1,0 +1,20 @@
+{
+  "name": "ai-agent-dev-review",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.0",
+    "@astrojs/sitemap": "^3.3.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "@fontsource/inter": "^5.0.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "astro": "^5.9.0",
+    "js-yaml": "^4.1.0",
+    "tailwindcss": "^3.4.0"
+  }
+}

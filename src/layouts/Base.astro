@@ -1,0 +1,209 @@
+---
+import '../styles/global.css';
+import { SITE, NICHE, NAV, MONETIZATION } from '../config';
+import { companies, getComparisons } from '../data/companies';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string | null;
+}
+
+const {
+  title       = SITE.name,
+  description = SITE.description,
+  canonical   = new URL(Astro.url.pathname, SITE.url).href,
+  ogImage     = null,
+} = Astro.props;
+
+const titleWithSite = title === SITE.name ? title : `${title} | ${SITE.name}`;
+// Strict <70-char budget for <title> (SEO): drop the " | SITE.name" suffix
+// rather than truncate mid-word if the full string would overflow.
+const pageTitle = titleWithSite.length >= 70 ? title : titleWithSite;
+
+// Featured companies (editor's picks) pinned first by rating, then alphabetical
+const navCompanies = [
+  ...companies.filter(c => c.featured).sort((a, b) => b.rating - a.rating),
+  ...companies.filter(c => !c.featured).sort((a, b) => a.name.localeCompare(b.name)),
+];
+
+// Top comparisons drawn from actual data (empty when no companies added yet)
+const topComparisons = getComparisons().slice(0, 6).map(({ slug, slug1, slug2 }) => {
+  const c1 = companies.find(c => c.slug === slug1)!;
+  const c2 = companies.find(c => c.slug === slug2)!;
+  return { label: `${c1.name} vs ${c2.name}`, href: `/comparisons/${slug}/` };
+});
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{pageTitle}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content={canonical} />
+  <meta property="og:title"       content={pageTitle} />
+  <meta property="og:description" content={description} />
+  {ogImage && <meta property="og:image" content={ogImage} />}
+  <meta property="og:locale"      content="en_US" />
+  <meta property="og:site_name"   content={SITE.name} />
+
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content={pageTitle} />
+  <meta name="twitter:description" content={description} />
+  {ogImage && <meta name="twitter:image" content={ogImage} />}
+  {SITE.twitterHandle && <meta name="twitter:site" content={SITE.twitterHandle} />}
+
+  <slot name="head" />
+</head>
+<body class="bg-white text-slate-800 antialiased">
+
+  <!-- HEADER -->
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <a href="/" class="text-brand-600 font-bold text-lg tracking-tight shrink-0">
+        {SITE.name}
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-1 text-sm font-medium text-slate-600">
+        <a href="/" class="px-3 py-2 rounded hover:text-brand-600 transition-colors">Home</a>
+
+        <!-- Companies dropdown -->
+        <div class="relative group">
+          <button class="px-3 py-2 rounded hover:text-brand-600 transition-colors flex items-center gap-1">
+            Companies
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="absolute top-full left-0 mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-80 overflow-y-auto">
+            {navCompanies.map(c => (
+              <a href={`/companies/${c.slug}/`} class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">{c.name}</a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Comparisons dropdown -->
+        <div class="relative group">
+          <button class="px-3 py-2 rounded hover:text-brand-600 transition-colors flex items-center gap-1">
+            Comparisons
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+            {topComparisons.map(c => (
+              <a href={c.href} class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">{c.label}</a>
+            ))}
+            <div class="border-t border-slate-100 mt-1 pt-1">
+              <a href="/#comparisons" class="block px-4 py-2 text-sm text-brand-600 font-medium hover:bg-slate-50">View all comparisons</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alternatives dropdown -->
+        <div class="relative group">
+          <button class="px-3 py-2 rounded hover:text-brand-600 transition-colors flex items-center gap-1">
+            Alternatives
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="absolute top-full left-0 mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 max-h-80 overflow-y-auto">
+            {navCompanies.map(c => (
+              <a href={`/alternatives/${c.slug}/`} class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">{c.name} alternatives</a>
+            ))}
+          </div>
+        </div>
+
+        <a href="/affiliate-disclosure/" class="px-3 py-2 rounded hover:text-brand-600 transition-colors">Disclosure</a>
+        <a href="/contact/" class="px-3 py-2 rounded hover:text-brand-600 transition-colors">Contact</a>
+      </nav>
+
+      <!-- Mobile nav -->
+      <details class="md:hidden relative">
+        <summary class="cursor-pointer list-none px-2 py-1 text-slate-600 hover:text-brand-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </summary>
+        <nav class="absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50 max-h-[80vh] overflow-y-auto">
+          <a href="/" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">Home</a>
+          <div class="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wide mt-2">Companies</div>
+          {navCompanies.map(c => (
+            <a href={`/companies/${c.slug}/`} class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">{c.name}</a>
+          ))}
+          <div class="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wide mt-2">Alternatives</div>
+          {navCompanies.map(c => (
+            <a href={`/alternatives/${c.slug}/`} class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">{c.name} alternatives</a>
+          ))}
+          <div class="border-t border-slate-100 mt-1 pt-1">
+            <a href="/affiliate-disclosure/" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Disclosure</a>
+            <a href="/contact/" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600">Contact</a>
+          </div>
+        </nav>
+      </details>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main>
+    <slot />
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 mt-16 py-12 bg-slate-50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <p class="font-bold text-slate-800 mb-3">{SITE.name}</p>
+          <p class="text-xs text-slate-500 leading-relaxed">Independent reviews of {NICHE.label} {NICHE.providersLabel}. Not affiliated with any company listed.</p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Top companies</p>
+          <ul class="space-y-2">
+            {navCompanies.slice(0, 8).map(c => (
+              <li><a href={`/companies/${c.slug}/`} class="text-xs text-slate-600 hover:text-brand-600">{c.name}</a></li>
+            ))}
+            <li><a href="/#all-profiles" class="text-xs text-brand-600 hover:underline">View all {companies.length} companies</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Alternatives</p>
+          <ul class="space-y-2">
+            {navCompanies.slice(0, 6).map(c => (
+              <li><a href={`/alternatives/${c.slug}/`} class="text-xs text-slate-600 hover:text-brand-600">{c.name} alternatives</a></li>
+            ))}
+            <li><a href="/#all-profiles" class="text-xs text-brand-600 hover:underline">All alternatives pages</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Resources</p>
+          <ul class="space-y-2">
+            <li><a href="/#comparisons" class="text-xs text-slate-600 hover:text-brand-600">All comparisons</a></li>
+            <li><a href="/affiliate-disclosure/" class="text-xs text-slate-600 hover:text-brand-600">Affiliate disclosure</a></li>
+            <li><a href="/contact/" class="text-xs text-slate-600 hover:text-brand-600">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-200 pt-6 text-xs text-slate-400">
+        <p>
+          &copy; {new Date().getFullYear()} {SITE.name}. Independent editorial reviews; not affiliated with any company listed.
+          {MONETIZATION.enabled && (
+            <> Some outbound links are <a href={MONETIZATION.disclosurePath} class="underline hover:text-brand-600">affiliate links</a>.</>
+          )}
+        </p>
+        <p class="mt-1">Verify all details directly with each company before making a decision.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+*.env
+.DS_Store
+.idea/
+*.iml
+.claude/settings.json
+.claude/settings.local.json

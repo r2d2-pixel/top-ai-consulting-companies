@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+
+<Base
+  title="Contact"
+  description={`Get in touch with ${SITE.name} — advertising, link placements, corrections, or general inquiries.`}
+  canonical={`${SITE.url}/contact/`}
+>
+  <section class="py-16 sm:py-24">
+    <div class="mx-auto max-w-xl px-4 sm:px-6">
+
+      <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Contact us</h1>
+      <p class="text-slate-600 mb-10">
+        Interested in a sponsored listing or link placement on {SITE.name}?
+        Fill out the form and we'll get back to you within 1–2 business days.
+      </p>
+
+      <div id="success" class="hidden bg-green-50 border border-green-200 text-green-800 rounded-lg px-5 py-4 mb-6 text-sm">
+        Thanks! Your message has been sent. We'll reply within 1–2 business days.
+      </div>
+      <div id="error" class="hidden bg-red-50 border border-red-200 text-red-800 rounded-lg px-5 py-4 mb-6 text-sm">
+        Something went wrong. Please try again or email us directly.
+      </div>
+
+      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" class="space-y-5">
+        <input type="hidden" name="access_key" value="032a901f-d3c0-46a4-afd4-907be497ee1e" />
+        <input type="hidden" name="subject" value={`Link placement inquiry — ${SITE.domain}`} />
+        <input type="hidden" name="from_name" value={SITE.name} />
+        <input type="checkbox" name="botcheck" class="hidden" />
+
+        <div>
+          <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Your name</label>
+          <input id="name" type="text" name="name" required autocomplete="name" placeholder="Jane Smith"
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email address</label>
+          <input id="email" type="email" name="email" required autocomplete="email" placeholder="jane@company.com"
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600" />
+        </div>
+
+        <div>
+          <label for="message" class="block text-sm font-medium text-slate-700 mb-1">Message</label>
+          <textarea id="message" name="message" required rows="5"
+            placeholder="Tell us about the placement you're looking for, your target URL, and any budget or timeline details."
+            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600 resize-y"></textarea>
+        </div>
+
+        <button type="submit" id="submit-btn"
+          class="w-full bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Send message
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('contact-form') as HTMLFormElement;
+    const btn  = document.getElementById('submit-btn') as HTMLButtonElement;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: new FormData(form),
+        });
+        const data = await res.json();
+        if (data.success) {
+          form.classList.add('hidden');
+          document.getElementById('success')!.classList.remove('hidden');
+        } else {
+          throw new Error(data.message);
+        }
+      } catch {
+        document.getElementById('error')!.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+      }
+    });
+  </script>
+</Base>

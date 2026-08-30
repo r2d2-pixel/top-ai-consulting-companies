@@ -1,0 +1,27 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Inter, system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .prose-custom {
+    @apply prose prose-slate max-w-none
+      prose-headings:font-semibold
+      prose-a:text-brand-600 prose-a:no-underline hover:prose-a:underline
+      prose-table:text-sm prose-th:font-semibold prose-td:align-top;
+  }
+}

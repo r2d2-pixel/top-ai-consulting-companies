@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config';
+---
+
+<Base
+  title="Affiliate Disclosure"
+  description={`How ${SITE.name} makes money and how that affects our reviews. Full transparency on affiliate relationships and editorial independence.`}
+>
+  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 pb-20">
+
+    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
+      <a href="/" class="hover:text-brand-600">Home</a>
+      <span>›</span>
+      <span class="text-slate-600">Affiliate Disclosure</span>
+    </nav>
+
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Affiliate Disclosure</h1>
+
+    <div class="prose-custom">
+
+      <h2>Does {SITE.name} earn money from the companies it reviews?</h2>
+      <p>
+        Yes, in some cases. {SITE.name} may earn a referral fee or commission when a reader
+        clicks an outbound link to a company listed on this site and subsequently purchases a
+        service or signs a contract. This is commonly called an affiliate or referral arrangement.
+      </p>
+      <p>
+        Not all companies listed on this site have an affiliate arrangement with us.
+        Companies that do are marked with a visible <strong>Sponsored</strong> label on their
+        card and review page. Outbound links to those companies carry a <code>rel="sponsored"</code>
+        attribute in the HTML, which is disclosed to search engines in line with Google's guidelines.
+      </p>
+
+      <h2>How does this affect our reviews and ratings?</h2>
+      <p>
+        Editorial ratings and review content are produced independently of any commercial
+        arrangement. The presence or absence of an affiliate relationship does not determine
+        which companies are included in our directory, what rating they receive, or what
+        is written in their review.
+      </p>
+      <p>
+        Specifically:
+      </p>
+      <ul>
+        <li>We do not accept payment to influence editorial ratings.</li>
+        <li>We do not accept payment to publish positive review content.</li>
+        <li>Companies cannot purchase inclusion in the directory.</li>
+        <li>A company with an affiliate arrangement is reviewed using the same criteria
+            as a company with no commercial relationship.</li>
+      </ul>
+
+      <h2>How can I tell which links are affiliate links?</h2>
+      <p>
+        On company cards and review pages, look for the <strong>Sponsored</strong> badge.
+        Any "Visit site" or outbound link associated with a sponsored company is an affiliate link.
+        Non-sponsored company links carry no commission.
+      </p>
+
+      <h2>Why does {SITE.name} use affiliate links?</h2>
+      <p>
+        Affiliate income allows us to invest time in researching, writing, and maintaining
+        independent reviews without charging readers a subscription fee. We believe this
+        model is preferable to paywalls, provided commercial relationships are fully disclosed
+        and do not influence editorial content — which is our commitment on this site.
+      </p>
+
+      <h2>What should I do before hiring any company listed here?</h2>
+      <p>
+        All reviews on this site are based on publicly available information: company websites,
+        published case studies, press releases, and industry sources. We verify facts where
+        possible and use neutral language for claims we cannot confirm directly.
+      </p>
+      <p>
+        Regardless of what any review says, you should:
+      </p>
+      <ul>
+        <li>Verify current services and pricing directly with the company.</li>
+        <li>Request client references before committing to an engagement.</li>
+        <li>Review contract terms, IP ownership clauses, and data handling practices independently.</li>
+        <li>Conduct your own due diligence appropriate to the scale and sensitivity of your project.</li>
+      </ul>
+
+      <h2>Questions about this disclosure?</h2>
+      <p>
+        If you have questions about our affiliate relationships or editorial process,
+        the <a href="/">homepage</a> links to all publicly available contact methods.
+      </p>
+
+    </div>
+  </div>
+</Base>
