@@ -17,7 +17,7 @@ const stars = [1, 2, 3, 4, 5].map(n => {
   {stars.map((type, i) => (
     <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 18" xmlns="http://www.w3.org/2000/svg">
       {type === 'full'  && <path d={PATH} fill="#FBBF24" />}
-      {type === 'empty' && <path d={PATH} fill="#E2E8F0" />}
+      {type === 'empty' && <path d={PATH} fill="#52525b" />}
       {type === 'half'  && (
         <>
           <defs>
@@ -25,7 +25,7 @@ const stars = [1, 2, 3, 4, 5].map(n => {
               <rect x="0" y="0" width="10" height="18" />
             </clipPath>
           </defs>
-          <path d={PATH} fill="#E2E8F0" />
+          <path d={PATH} fill="#52525b" />
           <path d={PATH} fill="#FBBF24" clip-path={`url(#h-${uid}-${i})`} />
         </>
       )}

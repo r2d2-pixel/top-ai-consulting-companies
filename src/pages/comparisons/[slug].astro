@@ -50,23 +50,20 @@ const related = allComparisons.filter(c =>
   (c.slug1 === slug1 || c.slug2 === slug1 || c.slug1 === slug2 || c.slug2 === slug2)
 ).slice(0, 6);
 
-// TODO: Update capability keys + checks to match your niche's service categories.
-// Keys must match the badge/use-case values in your companies.ts data.
 function hasCap(company: Company, cap: string): string {
   const checks: Record<string, (c: Company) => boolean> = {
-    'Custom build': c => c.badges.some(b => b.toLowerCase().includes('custom')),
-    'Consulting': c => c.badges.some(b => b.toLowerCase().includes('consult')) || c.useCases.some(u => u.toLowerCase().includes('consult') || u.toLowerCase().includes('strateg')),
-    'Integration': c => c.badges.some(b => b.toLowerCase().includes('integr')),
-    'Staff augmentation': c => c.badges.some(b => b.toLowerCase().includes('staff')),
+    'AI strategy consulting': c => c.badges.includes('ai-consulting'),
+    'Generative AI': c => c.badges.includes('generative-ai'),
+    'Machine learning': c => c.badges.includes('machine-learning'),
+    'Data engineering': c => c.badges.includes('data-engineering'),
+    'MLOps': c => c.badges.includes('mlops'),
     'Fixed-price projects': c => c.engagementModels.some(m => m.toLowerCase().includes('fixed')),
     'Dedicated team model': c => c.engagementModels.some(m => m.toLowerCase().includes('dedicated')),
   };
   return checks[cap]?.(company) ? '✓' : '✗';
 }
 
-// TODO: Replace this list with technologies/tools relevant to your niche.
-// These appear in the tech stack comparison table on every comparison page.
-const allTech = ['TODO: Tool 1', 'TODO: Tool 2', 'TODO: Tool 3', 'TODO: Tool 4', 'TODO: Tool 5'];
+const allTech = ['Python', 'AWS', 'Azure', 'Google Cloud', 'Kubernetes', 'LangChain', 'PyTorch'];
 
 function hasTech(company: Company, tech: string): string {
   return company.techStack.some(t => t.toLowerCase().includes(tech.toLowerCase())) ? '✓' : 'N/A';
@@ -77,14 +74,13 @@ const winner = c1.rating >= c2.rating ? c1 : c2;
 const runner = winner.slug === c1.slug ? c2 : c1;
 
 // Use-case table data — derived in frontmatter to avoid ?? in JSX
-// TODO: Replace with use cases specific to your niche
 const useCaseRows = [
   c1.useCases[0] || 'Use case 1',
   c1.useCases[1] || 'Use case 2',
   c2.useCases[0] || 'Use case 3',
   c2.useCases[1] || 'Use case 4',
-  'Fixed-price build',
-  'Staff augmentation',
+  'Fixed-price project',
+  'Dedicated team model',
 ].filter((v, i, a) => a.indexOf(v) === i).slice(0, 6);
 
 // Decision matrix — precomputed in frontmatter to keep JSX free of complex regex + ternary combinations
@@ -117,25 +113,25 @@ const decisionRows: [string, string][] = [
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb -->
-    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
-      <a href="/" class="hover:text-brand-600">Home</a>
+    <nav class="text-xs text-zinc-500 mb-6 flex items-center gap-1.5">
+      <a href="/" class="hover:text-brand-400">Home</a>
       <span>›</span>
-      <span class="text-slate-400">Comparisons</span>
+      <span class="text-zinc-500">Comparisons</span>
       <span>›</span>
-      <span class="text-slate-600">{c1.name} vs {c2.name}</span>
+      <span class="text-zinc-300">{c1.name} vs {c2.name}</span>
     </nav>
 
     <!-- H1 -->
-    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">
+    <h1 class="text-3xl sm:text-4xl font-bold text-zinc-50 mb-2">
       {c1.name} vs {c2.name}: full comparison for {new Date().getFullYear()}
     </h1>
 
     <!-- Quick verdict -->
-    <div class="bg-brand-50 border border-brand-200 rounded-xl p-5 mb-10">
-      <p class="font-semibold text-slate-900 mb-1">Quick verdict</p>
-      <p class="text-sm text-slate-700">
-        <a href={`/companies/${winner.slug}/`} class="font-bold text-brand-600">{winner.name}</a> ({winner.rating.toFixed(1)}/5)
-        edges ahead of <a href={`/companies/${runner.slug}/`} class="text-brand-600">{runner.name}</a> ({runner.rating.toFixed(1)}/5)
+    <div class="bg-brand-900/30 border border-brand-800 rounded-xl p-5 mb-10">
+      <p class="font-semibold text-zinc-50 mb-1">Quick verdict</p>
+      <p class="text-sm text-zinc-200">
+        <a href={`/companies/${winner.slug}/`} class="font-bold text-brand-400">{winner.name}</a> ({winner.rating.toFixed(1)}/5)
+        edges ahead of <a href={`/companies/${runner.slug}/`} class="text-brand-400">{runner.name}</a> ({runner.rating.toFixed(1)}/5)
         overall. {winner.name} is the better choice for {lowerFirstSentence(winner.bestFor)}.
         {runner.name} is the stronger option for {lowerFirstSentence(runner.bestFor)}.
         The right choice depends on your project size, budget, and required tech stack.
@@ -144,14 +140,14 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 1: Head-to-head summary -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">{c1.name} vs {c2.name}: head-to-head summary</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">{c1.name} vs {c2.name}: head-to-head summary</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-1/3">Criterion</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name}</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-1/3">Criterion</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name}</th>
             </tr>
           </thead>
           <tbody>
@@ -166,10 +162,10 @@ const decisionRows: [string, string][] = [
               ['Primary tech stack', c1.techStack.slice(0, 3).join(', '), c2.techStack.slice(0, 3).join(', ')],
               ['Industries served', c1.industries.join(', '), c2.industries.join(', ')],
             ].map(([criterion, v1, v2], i) => (
-              <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-700">{criterion}</td>
-                <td class="px-4 py-3 text-slate-700">{v1}</td>
-                <td class="px-4 py-3 text-slate-700">{v2}</td>
+              <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-200">{criterion}</td>
+                <td class="px-4 py-3 text-zinc-200">{v1}</td>
+                <td class="px-4 py-3 text-zinc-200">{v2}</td>
               </tr>
             ))}
           </tbody>
@@ -179,37 +175,37 @@ const decisionRows: [string, string][] = [
 
     <!-- Overview -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">{c1.name} vs {c2.name}: overview</h2>
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">{c1.name} vs {c2.name}: overview</h2>
       <div class="grid sm:grid-cols-2 gap-6">
-        <div class="border border-slate-200 rounded-xl p-5">
-          <h3 class="font-bold text-slate-900 mb-2">{c1.name}</h3>
-          <p class="text-sm text-slate-700">{c1.description}</p>
+        <div class="border border-zinc-700 rounded-xl p-5">
+          <h3 class="font-bold text-zinc-50 mb-2">{c1.name}</h3>
+          <p class="text-sm text-zinc-200">{c1.description}</p>
         </div>
-        <div class="border border-slate-200 rounded-xl p-5">
-          <h3 class="font-bold text-slate-900 mb-2">{c2.name}</h3>
-          <p class="text-sm text-slate-700">{c2.description}</p>
+        <div class="border border-zinc-700 rounded-xl p-5">
+          <h3 class="font-bold text-zinc-50 mb-2">{c2.name}</h3>
+          <p class="text-sm text-zinc-200">{c2.description}</p>
         </div>
       </div>
     </section>
 
     <!-- TABLE 2: Services and capabilities -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Services and capabilities: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Services and capabilities: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Capability</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name}</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Capability</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name}</th>
             </tr>
           </thead>
           <tbody>
-            {['Custom build', 'Consulting', 'Integration', 'Staff augmentation', 'Fixed-price projects', 'Dedicated team model'].map((cap, i) => (
-              <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-700">{cap}</td>
-                <td class={`px-4 py-3 font-semibold ${hasCap(c1, cap) === '✓' ? 'text-green-600' : 'text-red-400'}`}>{hasCap(c1, cap)}</td>
-                <td class={`px-4 py-3 font-semibold ${hasCap(c2, cap) === '✓' ? 'text-green-600' : 'text-red-400'}`}>{hasCap(c2, cap)}</td>
+            {['AI strategy consulting', 'Generative AI', 'Machine learning', 'Data engineering', 'MLOps', 'Fixed-price projects', 'Dedicated team model'].map((cap, i) => (
+              <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-200">{cap}</td>
+                <td class={`px-4 py-3 font-semibold ${hasCap(c1, cap) === '✓' ? 'text-green-400' : 'text-red-400'}`}>{hasCap(c1, cap)}</td>
+                <td class={`px-4 py-3 font-semibold ${hasCap(c2, cap) === '✓' ? 'text-green-400' : 'text-red-400'}`}>{hasCap(c2, cap)}</td>
               </tr>
             ))}
           </tbody>
@@ -219,22 +215,22 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 3: Tech stack -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Tech stack comparison: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Tech stack comparison: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Framework / platform</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name}</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Framework / platform</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name}</th>
             </tr>
           </thead>
           <tbody>
             {allTech.map((tech, i) => (
-              <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-700">{tech}</td>
-                <td class={`px-4 py-3 font-semibold ${hasTech(c1, tech) === '✓' ? 'text-green-600' : 'text-slate-400'}`}>{hasTech(c1, tech)}</td>
-                <td class={`px-4 py-3 font-semibold ${hasTech(c2, tech) === '✓' ? 'text-green-600' : 'text-slate-400'}`}>{hasTech(c2, tech)}</td>
+              <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-200">{tech}</td>
+                <td class={`px-4 py-3 font-semibold ${hasTech(c1, tech) === '✓' ? 'text-green-400' : 'text-zinc-500'}`}>{hasTech(c1, tech)}</td>
+                <td class={`px-4 py-3 font-semibold ${hasTech(c2, tech) === '✓' ? 'text-green-400' : 'text-zinc-500'}`}>{hasTech(c2, tech)}</td>
               </tr>
             ))}
           </tbody>
@@ -244,14 +240,14 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 4: Pricing -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Pricing comparison: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Pricing comparison: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Criterion</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name}</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Criterion</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name}</th>
             </tr>
           </thead>
           <tbody>
@@ -261,10 +257,10 @@ const decisionRows: [string, string][] = [
               ['Rate transparency', !isUndisclosedMinimum(c1.minimumEngagement) ? 'Minimum disclosed' : 'Not public', !isUndisclosedMinimum(c2.minimumEngagement) ? 'Minimum disclosed' : 'Not public'],
               ['Price tier', c1.minimumEngagement === '~$200K+' ? 'Enterprise' : isUndisclosedMinimum(c1.minimumEngagement) ? 'Mid-market' : parseInt(c1.minimumEngagement.replace(/\D/g, '')) <= 20000 ? 'Accessible' : 'Mid-market', c2.minimumEngagement === '~$200K+' ? 'Enterprise' : isUndisclosedMinimum(c2.minimumEngagement) ? 'Mid-market' : parseInt(c2.minimumEngagement.replace(/\D/g, '')) <= 20000 ? 'Accessible' : 'Mid-market'],
             ].map(([criterion, v1, v2], i) => (
-              <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-700">{criterion}</td>
-                <td class="px-4 py-3 text-slate-700">{v1}</td>
-                <td class="px-4 py-3 text-slate-700">{v2}</td>
+              <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-200">{criterion}</td>
+                <td class="px-4 py-3 text-zinc-200">{v1}</td>
+                <td class="px-4 py-3 text-zinc-200">{v2}</td>
               </tr>
             ))}
           </tbody>
@@ -274,14 +270,14 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 5: Target audience -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Target audience comparison: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Target audience comparison: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Dimension</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name}</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Dimension</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name}</th>
             </tr>
           </thead>
           <tbody>
@@ -291,10 +287,10 @@ const decisionRows: [string, string][] = [
               ['Best use cases', c1.useCases.slice(0, 2).join(', '), c2.useCases.slice(0, 2).join(', ')],
               ['Typical project type', c1.engagementModels[0], c2.engagementModels[0]],
             ].map(([dim, v1, v2], i) => (
-              <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-700">{dim}</td>
-                <td class="px-4 py-3 text-slate-700">{v1}</td>
-                <td class="px-4 py-3 text-slate-700">{v2}</td>
+              <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-200">{dim}</td>
+                <td class="px-4 py-3 text-zinc-200">{v1}</td>
+                <td class="px-4 py-3 text-zinc-200">{v2}</td>
               </tr>
             ))}
           </tbody>
@@ -304,49 +300,49 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 6: Pros and cons of each -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">{c1.name} vs {c2.name}: pros and cons</h2>
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">{c1.name} vs {c2.name}: pros and cons</h2>
       <div class="grid sm:grid-cols-2 gap-6">
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <div class="overflow-x-auto rounded-xl border border-zinc-700">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="text-left px-4 py-3 font-semibold text-brand-700" colspan="2">{c1.name}</th>
+              <tr class="bg-zinc-900 border-b border-zinc-700">
+                <th class="text-left px-4 py-3 font-semibold text-brand-300" colspan="2">{c1.name}</th>
               </tr>
             </thead>
             <tbody>
               {c1.pros.map((p, i) => (
-                <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                  <td class="px-4 py-3 text-green-700 font-bold w-6 align-top">+</td>
-                  <td class="px-4 py-3 text-slate-700">{p}</td>
+                <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                  <td class="px-4 py-3 text-green-300 font-bold w-6 align-top">+</td>
+                  <td class="px-4 py-3 text-zinc-200">{p}</td>
                 </tr>
               ))}
               {c1.cons.map((con, i) => (
-                <tr class={`border-b border-slate-100 ${(c1.pros.length + i) % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+                <tr class={`border-b border-zinc-800 ${(c1.pros.length + i) % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
                   <td class="px-4 py-3 text-red-400 font-bold w-6 align-top">-</td>
-                  <td class="px-4 py-3 text-slate-700">{con}</td>
+                  <td class="px-4 py-3 text-zinc-200">{con}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <div class="overflow-x-auto rounded-xl border border-zinc-700">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="text-left px-4 py-3 font-semibold text-slate-700" colspan="2">{c2.name}</th>
+              <tr class="bg-zinc-900 border-b border-zinc-700">
+                <th class="text-left px-4 py-3 font-semibold text-zinc-200" colspan="2">{c2.name}</th>
               </tr>
             </thead>
             <tbody>
               {c2.pros.map((p, i) => (
-                <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                  <td class="px-4 py-3 text-green-700 font-bold w-6 align-top">+</td>
-                  <td class="px-4 py-3 text-slate-700">{p}</td>
+                <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                  <td class="px-4 py-3 text-green-300 font-bold w-6 align-top">+</td>
+                  <td class="px-4 py-3 text-zinc-200">{p}</td>
                 </tr>
               ))}
               {c2.cons.map((con, i) => (
-                <tr class={`border-b border-slate-100 ${(c2.pros.length + i) % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+                <tr class={`border-b border-zinc-800 ${(c2.pros.length + i) % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
                   <td class="px-4 py-3 text-red-400 font-bold w-6 align-top">-</td>
-                  <td class="px-4 py-3 text-slate-700">{con}</td>
+                  <td class="px-4 py-3 text-zinc-200">{con}</td>
                 </tr>
               ))}
             </tbody>
@@ -359,34 +355,34 @@ const decisionRows: [string, string][] = [
     <section class="mb-10">
       <div class="grid sm:grid-cols-2 gap-6">
         <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-3">Who should choose {c1.name}?</h2>
-          <p class="text-sm text-slate-700 mb-2">A typical fit: {lowerFirstSentence(c1.useCases[0] || c1.bestFor)}.</p>
-          <p class="text-sm text-slate-700">{stripTrailingPeriods(c1.primaryDifferentiator)}. {!isUndisclosedMinimum(c1.minimumEngagement) ? `Minimum engagement starts at ${c1.minimumEngagement}.` : 'Minimum engagement is not publicly disclosed.'} Works best with clients in {c1.industries.join(', ')}.</p>
+          <h2 class="text-xl font-bold text-zinc-50 mb-3">Who should choose {c1.name}?</h2>
+          <p class="text-sm text-zinc-200 mb-2">A typical fit: {lowerFirstSentence(c1.useCases[0] || c1.bestFor)}.</p>
+          <p class="text-sm text-zinc-200">{stripTrailingPeriods(c1.primaryDifferentiator)}. {!isUndisclosedMinimum(c1.minimumEngagement) ? `Minimum engagement starts at ${c1.minimumEngagement}.` : 'Minimum engagement is not publicly disclosed.'} Works best with clients in {c1.industries.join(', ')}.</p>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-slate-900 mb-3">Who should choose {c2.name}?</h2>
-          <p class="text-sm text-slate-700 mb-2">A typical fit: {lowerFirstSentence(c2.useCases[0] || c2.bestFor)}.</p>
-          <p class="text-sm text-slate-700">{stripTrailingPeriods(c2.primaryDifferentiator)}. {!isUndisclosedMinimum(c2.minimumEngagement) ? `Minimum engagement starts at ${c2.minimumEngagement}.` : 'Minimum engagement is not publicly disclosed.'} Works best with clients in {c2.industries.join(', ')}.</p>
+          <h2 class="text-xl font-bold text-zinc-50 mb-3">Who should choose {c2.name}?</h2>
+          <p class="text-sm text-zinc-200 mb-2">A typical fit: {lowerFirstSentence(c2.useCases[0] || c2.bestFor)}.</p>
+          <p class="text-sm text-zinc-200">{stripTrailingPeriods(c2.primaryDifferentiator)}. {!isUndisclosedMinimum(c2.minimumEngagement) ? `Minimum engagement starts at ${c2.minimumEngagement}.` : 'Minimum engagement is not publicly disclosed.'} Works best with clients in {c2.industries.join(', ')}.</p>
         </div>
       </div>
     </section>
 
     <!-- TABLE 7: Decision matrix -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Decision matrix: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Decision matrix: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Your situation</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Recommended choice</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Your situation</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Recommended choice</th>
             </tr>
           </thead>
           <tbody>
             {decisionRows.map(([situation, choice], i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 text-slate-700">{situation}</td>
-                <td class="px-4 py-3 font-semibold text-brand-700">{choice}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 text-zinc-200">{situation}</td>
+                <td class="px-4 py-3 font-semibold text-brand-300">{choice}</td>
               </tr>
             ))}
           </tbody>
@@ -396,15 +392,15 @@ const decisionRows: [string, string][] = [
 
     <!-- TABLE 8: Use case matching -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Use case fit: {c1.name} vs {c2.name}</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Use case fit: {c1.name} vs {c2.name}</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Use case</th>
-              <th class="text-left px-4 py-3 font-semibold text-brand-700">{c1.name} fit</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">{c2.name} fit</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Winner</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Use case</th>
+              <th class="text-left px-4 py-3 font-semibold text-brand-300">{c1.name} fit</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">{c2.name} fit</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Winner</th>
             </tr>
           </thead>
           <tbody>
@@ -413,11 +409,11 @@ const decisionRows: [string, string][] = [
               const c2fit = c2.useCases.some(u => u.toLowerCase().includes(uc.split(' ')[0].toLowerCase())) ? 'Strong' : 'Limited';
               const w = c1fit === 'Strong' && c2fit !== 'Strong' ? c1.name : c2fit === 'Strong' && c1fit !== 'Strong' ? c2.name : 'Both equally';
               return (
-                <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                  <td class="px-4 py-3 font-medium text-slate-700">{uc}</td>
-                  <td class={`px-4 py-3 font-semibold ${c1fit === 'Strong' ? 'text-green-600' : 'text-slate-400'}`}>{c1fit}</td>
-                  <td class={`px-4 py-3 font-semibold ${c2fit === 'Strong' ? 'text-green-600' : 'text-slate-400'}`}>{c2fit}</td>
-                  <td class="px-4 py-3 text-slate-700 font-semibold">{w}</td>
+                <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                  <td class="px-4 py-3 font-medium text-zinc-200">{uc}</td>
+                  <td class={`px-4 py-3 font-semibold ${c1fit === 'Strong' ? 'text-green-400' : 'text-zinc-500'}`}>{c1fit}</td>
+                  <td class={`px-4 py-3 font-semibold ${c2fit === 'Strong' ? 'text-green-400' : 'text-zinc-500'}`}>{c2fit}</td>
+                  <td class="px-4 py-3 text-zinc-200 font-semibold">{w}</td>
                 </tr>
               );
             })}
@@ -428,22 +424,22 @@ const decisionRows: [string, string][] = [
 
     <!-- Verdict -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">Verdict: {c1.name} vs {c2.name}</h2>
-      <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-4">
-        <p class="text-slate-700 mb-3">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">Verdict: {c1.name} vs {c2.name}</h2>
+      <div class="bg-zinc-900 border border-zinc-700 rounded-xl p-6 mb-4">
+        <p class="text-zinc-200 mb-3">
           <strong>{winner.name}</strong> ({winner.rating.toFixed(1)}/5) is the stronger overall choice for most {NICHE.label} projects.
           {stripTrailingPeriods(winner.primaryDifferentiator)}.
         </p>
-        <p class="text-slate-700">
+        <p class="text-zinc-200">
           <strong>{runner.name}</strong> ({runner.rating.toFixed(1)}/5) is worth a look if you need {lowerFirstSentence(runner.useCases[1] || runner.useCases[0] || runner.bestFor)}.
           If your situation matches that, {runner.name} is a competitive option.
         </p>
       </div>
       <div class="flex flex-wrap gap-3">
-        <a href={`/companies/${c1.slug}/`} class="bg-brand-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-700 transition-colors text-sm">
+        <a href={`/companies/${c1.slug}/`} class="bg-brand-500 text-zinc-950 font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-400 transition-colors text-sm">
           Read {c1.name} full review
         </a>
-        <a href={`/companies/${c2.slug}/`} class="border border-slate-300 text-slate-700 font-semibold px-5 py-2.5 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors text-sm">
+        <a href={`/companies/${c2.slug}/`} class="border border-zinc-600 text-zinc-200 font-semibold px-5 py-2.5 rounded-lg hover:border-brand-800 hover:text-brand-400 transition-colors text-sm">
           Read {c2.name} full review
         </a>
       </div>
@@ -452,13 +448,13 @@ const decisionRows: [string, string][] = [
     <!-- Related comparisons -->
     {related.length > 0 && (
       <section class="mb-10">
-        <h2 class="text-xl font-bold text-slate-900 mb-4">Related comparisons</h2>
+        <h2 class="text-xl font-bold text-zinc-50 mb-4">Related comparisons</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {related.map(c => {
             const rc1 = companies.find(co => co.slug === c.slug1)!;
             const rc2 = companies.find(co => co.slug === c.slug2)!;
             return (
-              <a href={`/comparisons/${c.slug}/`} class="border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-colors">
+              <a href={`/comparisons/${c.slug}/`} class="border border-zinc-700 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-200 hover:border-brand-800 hover:text-brand-400 hover:bg-brand-900/30 transition-colors">
                 {rc1.name} vs {rc2.name}
               </a>
             );
@@ -469,34 +465,34 @@ const decisionRows: [string, string][] = [
 
     <!-- FAQ -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-6">{c1.name} vs {c2.name} FAQ</h2>
+      <h2 class="text-xl font-bold text-zinc-50 mb-6">{c1.name} vs {c2.name} FAQ</h2>
       <div class="space-y-5">
-        <div class="border-b border-slate-100 pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">Is {c1.name} better than {c2.name}?</h3>
-          <p class="text-sm text-slate-600">
+        <div class="border-b border-zinc-800 pb-5">
+          <h3 class="font-semibold text-zinc-50 mb-2">Is {c1.name} better than {c2.name}?</h3>
+          <p class="text-sm text-zinc-300">
             {winner.name} ({winner.rating.toFixed(1)}/5) scores higher overall, but "better" depends on your use case.
             {c1.name}'s strongest advantage: {c1.pros[0] ? lowerFirstSentence(c1.pros[0]) : lowerFirstSentence(c1.primaryDifferentiator)}.
             {c2.name}'s strongest advantage: {c2.pros[0] ? lowerFirstSentence(c2.pros[0]) : lowerFirstSentence(c2.primaryDifferentiator)}.
           </p>
         </div>
-        <div class="border-b border-slate-100 pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">How do {c1.name} and {c2.name} differ in pricing?</h3>
-          <p class="text-sm text-slate-600">
+        <div class="border-b border-zinc-800 pb-5">
+          <h3 class="font-semibold text-zinc-50 mb-2">How do {c1.name} and {c2.name} differ in pricing?</h3>
+          <p class="text-sm text-zinc-300">
             {c1.name} uses {c1.pricingModel.toLowerCase()} pricing{!isUndisclosedMinimum(c1.minimumEngagement) ? ` with a minimum engagement of ${c1.minimumEngagement}` : ''}.
             {c2.name} uses {c2.pricingModel.toLowerCase()} pricing{!isUndisclosedMinimum(c2.minimumEngagement) ? ` with a minimum engagement of ${c2.minimumEngagement}` : ''}.
             Neither firm publishes a full rate card; a discovery call is required for project-specific quotes.
           </p>
         </div>
-        <div class="border-b border-slate-100 pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">Which is better for enterprise: {c1.name} or {c2.name}?</h3>
-          <p class="text-sm text-slate-600">
+        <div class="border-b border-zinc-800 pb-5">
+          <h3 class="font-semibold text-zinc-50 mb-2">Which is better for enterprise: {c1.name} or {c2.name}?</h3>
+          <p class="text-sm text-zinc-300">
             {(parseInt(c1.teamSize.replace(/\D/g,'') || '0') >= parseInt(c2.teamSize.replace(/\D/g,'') || '0') ? c1.name : c2.name)} is the larger team and typically the better enterprise-scale choice.
             For very large programmes, verify team size and compliance coverage directly with each {NICHE.providerLabel} before shortlisting.
           </p>
         </div>
         <div class="pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">What are the main differences between {c1.name} and {c2.name}?</h3>
-          <p class="text-sm text-slate-600">
+          <h3 class="font-semibold text-zinc-50 mb-2">What are the main differences between {c1.name} and {c2.name}?</h3>
+          <p class="text-sm text-zinc-300">
             {c1.name}'s primary differentiator is: {lowerFirstSentence(c1.primaryDifferentiator)}.
             {c2.name}'s primary differentiator is: {lowerFirstSentence(c2.primaryDifferentiator)}.
             They also differ in team size ({c1.teamSize} vs {c2.teamSize}), minimum engagement ({c1.minimumEngagement} vs {c2.minimumEngagement}), and primary industries served ({c1.industries.slice(0,2).join(', ')} vs {c2.industries.slice(0,2).join(', ')}).
@@ -505,7 +501,7 @@ const decisionRows: [string, string][] = [
       </div>
     </section>
 
-    <p class="text-xs text-slate-400 border-t border-slate-100 pt-4">
+    <p class="text-xs text-zinc-500 border-t border-zinc-800 pt-4">
       Verify all details directly with each {NICHE.providerLabel} before making a decision.
     </p>
 

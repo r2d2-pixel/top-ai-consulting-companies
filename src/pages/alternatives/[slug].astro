@@ -48,54 +48,54 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb -->
-    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
-      <a href="/" class="hover:text-brand-600">Home</a>
+    <nav class="text-xs text-zinc-500 mb-6 flex items-center gap-1.5">
+      <a href="/" class="hover:text-brand-400">Home</a>
       <span>›</span>
-      <span class="text-slate-400">Alternatives</span>
+      <span class="text-zinc-500">Alternatives</span>
       <span>›</span>
-      <span class="text-slate-600">{company.name} alternatives</span>
+      <span class="text-zinc-300">{company.name} alternatives</span>
     </nav>
 
     <!-- Hero -->
     <div class="mb-10">
-      <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Best {company.name} alternatives in {new Date().getFullYear()}</h1>
-      <p class="text-slate-600 text-lg mb-2">
+      <h1 class="text-3xl sm:text-4xl font-bold text-zinc-50 mb-3">Best {company.name} alternatives in {new Date().getFullYear()}</h1>
+      <p class="text-zinc-300 text-lg mb-2">
         {company.name} is {lowerFirstSentence(company.tagline)}.
         Teams looking for alternatives typically seek different pricing structures, technical specialisations, or coverage approaches.
         {alternatives.length > 0 && lowerFirstSentence(alternatives[0].primaryDifferentiator) + '.'}
       </p>
-      <p class="text-slate-600">
+      <p class="text-zinc-300">
         The {alternatives.length} alternatives below are all top-rated {NICHE.label} {NICHE.providersLabel} with verified delivery records.
       </p>
     </div>
 
     <!-- Comparison summary table -->
     <section class="mb-12">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">How {company.name} alternatives compare</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">How {company.name} alternatives compare</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Key difference from {company.name}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Pricing model</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Rating</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Best for</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Key difference from {company.name}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 whitespace-nowrap">Pricing model</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Rating</th>
             </tr>
           </thead>
           <tbody>
             {alternatives.map((alt, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
                 <td class="px-4 py-3">
-                  <a href={`/companies/${alt.slug}/`} class="font-semibold text-brand-600 hover:underline">{alt.name}</a>
+                  <a href={`/companies/${alt.slug}/`} class="font-semibold text-brand-400 hover:underline">{alt.name}</a>
                 </td>
-                <td class="px-4 py-3 text-slate-600 text-xs">{truncateWords(alt.bestFor, 8)}</td>
-                <td class="px-4 py-3 text-slate-600 text-xs">{alt.primaryDifferentiator}</td>
-                <td class="px-4 py-3 text-slate-600 text-xs">{alt.pricingModel}</td>
+                <td class="px-4 py-3 text-zinc-300 text-xs">{truncateWords(alt.bestFor, 8)}</td>
+                <td class="px-4 py-3 text-zinc-300 text-xs">{alt.primaryDifferentiator}</td>
+                <td class="px-4 py-3 text-zinc-300 text-xs">{alt.pricingModel}</td>
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-1">
-                    <span class="font-semibold text-slate-900">{alt.rating.toFixed(1)}</span>
-                    <span class="text-slate-400 text-xs">/ 5</span>
+                    <span class="font-semibold text-zinc-50">{alt.rating.toFixed(1)}</span>
+                    <span class="text-zinc-500 text-xs">/ 5</span>
                   </div>
                 </td>
               </tr>
@@ -107,7 +107,7 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
 
     <!-- Individual alternative profiles -->
     <section class="mb-12">
-      <h2 class="text-xl font-bold text-slate-900 mb-6">Top {company.name} alternatives in {new Date().getFullYear()}</h2>
+      <h2 class="text-xl font-bold text-zinc-50 mb-6">Top {company.name} alternatives in {new Date().getFullYear()}</h2>
       <div class="space-y-8">
         {alternatives.map((alt, i) => {
           const compSlug = allComparisons.find(
@@ -115,59 +115,59 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
                  (c.slug2 === company.slug && c.slug1 === alt.slug)
           )?.slug;
           return (
-            <div class="border border-slate-200 rounded-xl p-6">
+            <div class="border border-zinc-700 rounded-xl p-6">
               <div class="flex items-start justify-between flex-wrap gap-4 mb-3">
                 <div>
-                  <h2 class="text-xl font-bold text-slate-900 mb-1">
-                    <a href={`/companies/${alt.slug}/`} class="hover:text-brand-600">{i + 1}. {alt.name}</a>
+                  <h2 class="text-xl font-bold text-zinc-50 mb-1">
+                    <a href={`/companies/${alt.slug}/`} class="hover:text-brand-400">{i + 1}. {alt.name}</a>
                   </h2>
-                  <p class="text-sm text-slate-500 italic">{alt.tagline}</p>
+                  <p class="text-sm text-zinc-400 italic">{alt.tagline}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <StarRating rating={alt.rating} />
-                  <span class="font-bold text-slate-900">{alt.rating.toFixed(1)}</span>
+                  <span class="font-bold text-zinc-50">{alt.rating.toFixed(1)}</span>
                 </div>
               </div>
 
-              <p class="text-sm text-slate-700 mb-4">{alt.description}</p>
+              <p class="text-sm text-zinc-200 mb-4">{alt.description}</p>
 
-              <p class="text-sm text-slate-700 mb-4">
+              <p class="text-sm text-zinc-200 mb-4">
                 <strong>How it differs from {company.name}:</strong> {stripTrailingPeriods(alt.primaryDifferentiator)}.
                 While {company.name} excels at {lowerFirstSentence(company.primaryDifferentiator)},
                 {alt.name} is better for {lowerFirstSentence(alt.bestFor)}.
               </p>
 
-              <div class="overflow-x-auto rounded-lg border border-slate-200 mb-4">
+              <div class="overflow-x-auto rounded-lg border border-zinc-700 mb-4">
                 <table class="w-full text-xs">
                   <tbody>
-                    <tr class="border-b border-slate-100">
-                      <td class="px-3 py-2 font-semibold text-slate-500 w-32">Founded</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.founded}</td>
-                      <td class="px-3 py-2 font-semibold text-slate-500 w-32">HQ</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.hq}</td>
+                    <tr class="border-b border-zinc-800">
+                      <td class="px-3 py-2 font-semibold text-zinc-400 w-32">Founded</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.founded}</td>
+                      <td class="px-3 py-2 font-semibold text-zinc-400 w-32">HQ</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.hq}</td>
                     </tr>
-                    <tr class="border-b border-slate-100 bg-slate-50/50">
-                      <td class="px-3 py-2 font-semibold text-slate-500">Team</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.teamSize}</td>
-                      <td class="px-3 py-2 font-semibold text-slate-500">Rating</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.rating.toFixed(1)} / 5</td>
+                    <tr class="border-b border-zinc-800 bg-zinc-900/50">
+                      <td class="px-3 py-2 font-semibold text-zinc-400">Team</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.teamSize}</td>
+                      <td class="px-3 py-2 font-semibold text-zinc-400">Rating</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.rating.toFixed(1)} / 5</td>
                     </tr>
                     <tr>
-                      <td class="px-3 py-2 font-semibold text-slate-500">Min. engagement</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.minimumEngagement}</td>
-                      <td class="px-3 py-2 font-semibold text-slate-500">Pricing</td>
-                      <td class="px-3 py-2 text-slate-700">{alt.pricingModel}</td>
+                      <td class="px-3 py-2 font-semibold text-zinc-400">Min. engagement</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.minimumEngagement}</td>
+                      <td class="px-3 py-2 font-semibold text-zinc-400">Pricing</td>
+                      <td class="px-3 py-2 text-zinc-200">{alt.pricingModel}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <div class="flex flex-wrap gap-2">
-                <a href={`/companies/${alt.slug}/`} class="text-sm font-semibold text-brand-600 border border-brand-200 px-4 py-1.5 rounded-lg hover:bg-brand-50 transition-colors">
+                <a href={`/companies/${alt.slug}/`} class="text-sm font-semibold text-brand-400 border border-brand-800 px-4 py-1.5 rounded-lg hover:bg-brand-900/30 transition-colors">
                   Read full review
                 </a>
                 {compSlug && (
-                  <a href={`/comparisons/${compSlug}/`} class="text-sm font-semibold text-slate-600 border border-slate-300 px-4 py-1.5 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors">
+                  <a href={`/comparisons/${compSlug}/`} class="text-sm font-semibold text-zinc-300 border border-zinc-600 px-4 py-1.5 rounded-lg hover:border-brand-800 hover:text-brand-400 transition-colors">
                     Compare {alt.name} vs {company.name}
                   </a>
                 )}
@@ -180,41 +180,41 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
 
     <!-- How to choose -->
     <section class="mb-12">
-      <h2 class="text-xl font-bold text-slate-900 mb-4">How to choose between {company.name} and its alternatives</h2>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-xl font-bold text-zinc-50 mb-4">How to choose between {company.name} and its alternatives</h2>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Criterion</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Choose {company.name} if</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Choose an alternative if</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Criterion</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Choose {company.name} if</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Choose an alternative if</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Budget</td>
-              <td class="px-4 py-3 text-slate-600">{!isUndisclosedMinimum(company.minimumEngagement) ? `Your budget aligns with ${company.minimumEngagement} minimum engagement` : 'Minimum engagement is not publicly disclosed'}</td>
-              <td class="px-4 py-3 text-slate-600">You need a lower minimum — check the alternatives table above for the lowest-minimum option</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Budget</td>
+              <td class="px-4 py-3 text-zinc-300">{!isUndisclosedMinimum(company.minimumEngagement) ? `Your budget aligns with ${company.minimumEngagement} minimum engagement` : 'Minimum engagement is not publicly disclosed'}</td>
+              <td class="px-4 py-3 text-zinc-300">You need a lower minimum — check the alternatives table above for the lowest-minimum option</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Team size needs</td>
-              <td class="px-4 py-3 text-slate-600">You need a {company.teamSize} team with focused {NICHE.label} delivery</td>
-              <td class="px-4 py-3 text-slate-600">You need a much larger team or a multi-region programme — check alternatives by team size</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Team size needs</td>
+              <td class="px-4 py-3 text-zinc-300">You need a {company.teamSize} team with focused {NICHE.label} delivery</td>
+              <td class="px-4 py-3 text-zinc-300">You need a much larger team or a multi-region programme — check alternatives by team size</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Specialisation</td>
-              <td class="px-4 py-3 text-slate-600">{company.primaryDifferentiator}</td>
-              <td class="px-4 py-3 text-slate-600">You need a different specialisation — check the alternatives' primary differentiators above</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Specialisation</td>
+              <td class="px-4 py-3 text-zinc-300">{company.primaryDifferentiator}</td>
+              <td class="px-4 py-3 text-zinc-300">You need a different specialisation — check the alternatives' primary differentiators above</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Engagement model</td>
-              <td class="px-4 py-3 text-slate-600">{company.pricingModel} fits your project structure</td>
-              <td class="px-4 py-3 text-slate-600">You need a different model (e.g. time-and-materials or dedicated team) — compare engagement models above</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Engagement model</td>
+              <td class="px-4 py-3 text-zinc-300">{company.pricingModel} fits your project structure</td>
+              <td class="px-4 py-3 text-zinc-300">You need a different model (e.g. time-and-materials or dedicated team) — compare engagement models above</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Industry vertical</td>
-              <td class="px-4 py-3 text-slate-600">You work in {company.industries.slice(0, 2).join(' or ')}</td>
-              <td class="px-4 py-3 text-slate-600">You need deep expertise in a different vertical — check each alternative's industry list</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Industry vertical</td>
+              <td class="px-4 py-3 text-zinc-300">You work in {company.industries.slice(0, 2).join(' or ')}</td>
+              <td class="px-4 py-3 text-zinc-300">You need deep expertise in a different vertical — check each alternative's industry list</td>
             </tr>
           </tbody>
         </table>
@@ -223,22 +223,22 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
 
     <!-- FAQ -->
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-900 mb-6">{company.name} alternatives FAQ</h2>
+      <h2 class="text-xl font-bold text-zinc-50 mb-6">{company.name} alternatives FAQ</h2>
       <div class="space-y-5">
-        <div class="border-b border-slate-100 pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">What is the best alternative to {company.name}?</h3>
-          <p class="text-sm text-slate-600 mb-2">
+        <div class="border-b border-zinc-800 pb-5">
+          <h3 class="font-semibold text-zinc-50 mb-2">What is the best alternative to {company.name}?</h3>
+          <p class="text-sm text-zinc-300 mb-2">
             The best alternative depends on your use case and budget. The top three alternatives by rating are:
           </p>
-          <ul class="text-sm text-slate-600 space-y-1">
+          <ul class="text-sm text-zinc-300 space-y-1">
             {alternatives.slice(0, 3).map(alt => (
-              <li><a href={`/companies/${alt.slug}/`} class="text-brand-600 hover:underline">{alt.name}</a>: {alt.primaryDifferentiator.toLowerCase()}</li>
+              <li><a href={`/companies/${alt.slug}/`} class="text-brand-400 hover:underline">{alt.name}</a>: {alt.primaryDifferentiator.toLowerCase()}</li>
             ))}
           </ul>
         </div>
-        <div class="border-b border-slate-100 pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">How does {company.name} compare to {alternatives[0]?.name}?</h3>
-          <p class="text-sm text-slate-600">
+        <div class="border-b border-zinc-800 pb-5">
+          <h3 class="font-semibold text-zinc-50 mb-2">How does {company.name} compare to {alternatives[0]?.name}?</h3>
+          <p class="text-sm text-zinc-300">
             {company.name} focuses on {lowerFirstSentence(company.primaryDifferentiator)}.
             {alternatives[0]?.name} is differentiated by {alternatives[0] ? lowerFirstSentence(alternatives[0].primaryDifferentiator) : ''}.
             {alternatives[0]?.name} is best for {alternatives[0] ? lowerFirstSentence(alternatives[0].bestFor) : ''}.
@@ -246,8 +246,8 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
           </p>
         </div>
         <div class="pb-5">
-          <h3 class="font-semibold text-slate-900 mb-2">Is there a cheaper alternative to {company.name}?</h3>
-          <p class="text-sm text-slate-600">
+          <h3 class="font-semibold text-zinc-50 mb-2">Is there a cheaper alternative to {company.name}?</h3>
+          <p class="text-sm text-zinc-300">
             {!isUndisclosedMinimum(company.minimumEngagement)
               ? `${company.name} starts at ${company.minimumEngagement}. `
               : `${company.name} does not disclose minimum engagement publicly. `}
@@ -258,7 +258,7 @@ const pageDesc = `Compare the top ${company.name} alternatives for ${NICHE.label
       </div>
     </section>
 
-    <p class="text-xs text-slate-400 border-t border-slate-100 pt-4">
+    <p class="text-xs text-zinc-500 border-t border-zinc-800 pt-4">
       Verify all details directly with each {NICHE.providerLabel} before making a decision.
     </p>
 

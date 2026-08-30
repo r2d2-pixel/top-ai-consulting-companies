@@ -71,24 +71,24 @@ const jsonLd = [
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Breadcrumb -->
-    <nav class="text-xs text-slate-400 mb-6 flex items-center gap-1.5">
-      <a href="/" class="hover:text-brand-600">Home</a>
+    <nav class="text-xs text-zinc-500 mb-6 flex items-center gap-1.5">
+      <a href="/" class="hover:text-brand-400">Home</a>
       <span>›</span>
-      <a href="/#comparison-table" class="hover:text-brand-600">Companies</a>
+      <a href="/#comparison-table" class="hover:text-brand-400">Companies</a>
       <span>›</span>
-      <span class="text-slate-600">{company.name}</span>
+      <span class="text-zinc-300">{company.name}</span>
     </nav>
 
     <!-- Company header -->
-    <div class="border border-slate-200 rounded-xl p-6 mb-6">
+    <div class="border border-zinc-700 rounded-xl p-6 mb-6">
       <div class="flex items-start justify-between flex-wrap gap-4 mb-4">
         <div>
           <div class="flex items-center gap-3 mb-1">
-            <h1 class="text-3xl font-bold text-slate-900">{company.name}</h1>
-            {company.featured && <span class="text-sm bg-brand-600 text-white px-3 py-1 rounded-full">Editor's pick #1</span>}
+            <h1 class="text-3xl font-bold text-zinc-50">{company.name}</h1>
+            {company.featured && <span class="text-sm bg-brand-500 text-zinc-950 px-3 py-1 rounded-full">Editor's pick #1</span>}
           </div>
-          <p class="text-slate-500 italic mb-3">{company.tagline}</p>
-          <div class="flex flex-wrap gap-4 text-sm text-slate-600">
+          <p class="text-zinc-400 italic mb-3">{company.tagline}</p>
+          <div class="flex flex-wrap gap-4 text-sm text-zinc-300">
             <span>Founded {company.founded}</span>
             <span>|</span>
             <span>{company.hq}</span>
@@ -99,14 +99,14 @@ const jsonLd = [
         <div class="text-right">
           <div class="flex items-center gap-2 mb-3">
             <StarRating rating={company.rating} />
-            <span class="text-2xl font-bold text-slate-900">{company.rating.toFixed(1)}</span>
-            <span class="text-slate-400 text-sm">/ 5</span>
+            <span class="text-2xl font-bold text-zinc-50">{company.rating.toFixed(1)}</span>
+            <span class="text-zinc-500 text-sm">/ 5</span>
           </div>
           <a
             href={company.website}
             target="_blank"
             rel="noopener noreferrer nofollow"
-            class="inline-block bg-brand-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-700 transition-colors text-sm"
+            class="inline-block bg-brand-500 text-zinc-950 font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-400 transition-colors text-sm"
           >
             Visit website
           </a>
@@ -116,13 +116,13 @@ const jsonLd = [
       <!-- Badges -->
       <div class="flex flex-wrap gap-2">
         {company.badges.map(b => (
-          <span class="text-xs bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-1 rounded-full font-medium">{b}</span>
+          <span class="text-xs bg-brand-900/30 text-brand-300 border border-brand-800 px-2.5 py-1 rounded-full font-medium">{SERVICE_LABELS[b] ?? b}</span>
         ))}
       </div>
     </div>
 
     <!-- Quick nav tabs -->
-    <div class="flex gap-1 overflow-x-auto mb-8 border-b border-slate-200 pb-0">
+    <div class="flex gap-1 overflow-x-auto mb-8 border-b border-zinc-700 pb-0">
       {[
         { label: 'Overview', href: '#overview' },
         { label: 'Tech stack', href: '#tech-stack' },
@@ -131,7 +131,7 @@ const jsonLd = [
         { label: 'Alternatives', href: '#alternatives' },
         { label: 'FAQ', href: '#faq' },
       ].map(t => (
-        <a href={t.href} class="text-sm font-medium text-slate-600 px-4 py-2.5 whitespace-nowrap hover:text-brand-600 border-b-2 border-transparent hover:border-brand-600 transition-colors">
+        <a href={t.href} class="text-sm font-medium text-zinc-300 px-4 py-2.5 whitespace-nowrap hover:text-brand-400 border-b-2 border-transparent hover:border-brand-600 transition-colors">
           {t.label}
         </a>
       ))}
@@ -144,9 +144,9 @@ const jsonLd = [
 
         <!-- Overview -->
         <section id="overview" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">What is {company.name}?</h2>
-          <p class="text-slate-700 leading-relaxed mb-4">{company.description}</p>
-          <p class="text-slate-700 leading-relaxed">
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">What is {company.name}?</h2>
+          <p class="text-zinc-200 leading-relaxed mb-4">{company.description}</p>
+          <p class="text-zinc-200 leading-relaxed">
             {company.name} works primarily with clients in {company.industries.join(', ')} sectors.
             Its primary differentiator is: {stripTrailingPeriods(company.primaryDifferentiator)}.
           </p>
@@ -154,23 +154,23 @@ const jsonLd = [
 
         <!-- Tech stack -->
         <section id="tech-stack" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} tech stack and services</h2>
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">{company.name} tech stack and services</h2>
           <div class="flex flex-wrap gap-2 mb-6">
             {company.techStack.map(t => (
-              <span class="text-sm bg-slate-100 text-slate-700 px-3 py-1 rounded-full">{t}</span>
+              <span class="text-sm bg-zinc-800 text-zinc-200 px-3 py-1 rounded-full">{t}</span>
             ))}
           </div>
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <div class="overflow-x-auto rounded-xl border border-zinc-700">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200">
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Service area</th>
+                <tr class="bg-zinc-900 border-b border-zinc-700">
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Service area</th>
                 </tr>
               </thead>
               <tbody>
                 {company.badges.map((b, i) => (
-                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
-                    <td class="px-4 py-3 font-medium text-slate-800">{SERVICE_LABELS[b] ?? b}</td>
+                  <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/50' : ''}`}>
+                    <td class="px-4 py-3 font-medium text-zinc-100">{SERVICE_LABELS[b] ?? b}</td>
                   </tr>
                 ))}
               </tbody>
@@ -180,32 +180,32 @@ const jsonLd = [
 
         <!-- Pricing -->
         <section id="pricing" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} pricing</h2>
-          <p class="text-slate-600 mb-4 text-sm">
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">{company.name} pricing</h2>
+          <p class="text-zinc-300 mb-4 text-sm">
             Short answer: {company.name} uses a {company.pricingModel.toLowerCase()} pricing approach.
             {!isUndisclosedMinimum(company.minimumEngagement)
               ? `Minimum engagement starts at ${company.minimumEngagement}.`
               : 'Minimum engagement is not publicly disclosed; a discovery call is required.'}
           </p>
-          <div class="overflow-x-auto rounded-xl border border-slate-200 mb-4">
+          <div class="overflow-x-auto rounded-xl border border-zinc-700 mb-4">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200">
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Engagement model</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Typical range</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
+                <tr class="bg-zinc-900 border-b border-zinc-700">
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Engagement model</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Typical range</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Best for</th>
                 </tr>
               </thead>
               <tbody>
                 {company.engagementModels.map((m, i) => (
-                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
-                    <td class="px-4 py-3 font-medium text-slate-800">{m}</td>
-                    <td class="px-4 py-3 text-slate-600">
+                  <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/50' : ''}`}>
+                    <td class="px-4 py-3 font-medium text-zinc-100">{m}</td>
+                    <td class="px-4 py-3 text-zinc-300">
                       {m.toLowerCase().includes('fixed') ? `From ${!isUndisclosedMinimum(company.minimumEngagement) ? company.minimumEngagement : 'not disclosed'}` :
                        m.toLowerCase().includes('retainer') ? 'Monthly rate; not public' :
                        'Variable; depends on team size'}
                     </td>
-                    <td class="px-4 py-3 text-slate-600">
+                    <td class="px-4 py-3 text-zinc-300">
                       {m.toLowerCase().includes('fixed') ? 'Well-defined scope' :
                        m.toLowerCase().includes('retainer') ? 'Ongoing AI engineering' :
                        'Large programmes or team augmentation'}
@@ -215,29 +215,29 @@ const jsonLd = [
               </tbody>
             </table>
           </div>
-          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+          <div class="bg-amber-900/30 border border-amber-800 rounded-lg p-4 text-sm text-amber-300">
             {company.name} does not publish a public rate card. Contact them directly via their website to get project-specific pricing.
           </div>
         </section>
 
         <!-- Pros and cons -->
         <section id="pros-cons" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} pros and cons</h2>
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">{company.name} pros and cons</h2>
+          <div class="overflow-x-auto rounded-xl border border-zinc-700">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200">
-                  <th class="text-left px-4 py-3 font-semibold text-green-700 w-1/2">Advantages</th>
-                  <th class="text-left px-4 py-3 font-semibold text-red-600 w-1/2">Things to consider</th>
+                <tr class="bg-zinc-900 border-b border-zinc-700">
+                  <th class="text-left px-4 py-3 font-semibold text-green-300 w-1/2">Advantages</th>
+                  <th class="text-left px-4 py-3 font-semibold text-red-400 w-1/2">Things to consider</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: Math.max(company.pros.length, company.cons.length) }, (_, i) => (
-                  <tr class={`border-b border-slate-100 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
-                    <td class="px-4 py-3 text-slate-700 align-top">
-                      {company.pros[i] && <span class="flex items-start gap-2"><span class="text-green-600 font-bold mt-0.5 shrink-0">+</span>{company.pros[i]}</span>}
+                  <tr class={`border-b border-zinc-800 ${i % 2 === 1 ? 'bg-zinc-900/50' : ''}`}>
+                    <td class="px-4 py-3 text-zinc-200 align-top">
+                      {company.pros[i] && <span class="flex items-start gap-2"><span class="text-green-400 font-bold mt-0.5 shrink-0">+</span>{company.pros[i]}</span>}
                     </td>
-                    <td class="px-4 py-3 text-slate-700 align-top">
+                    <td class="px-4 py-3 text-zinc-200 align-top">
                       {company.cons[i] && <span class="flex items-start gap-2"><span class="text-red-400 font-bold mt-0.5 shrink-0">-</span>{company.cons[i]}</span>}
                     </td>
                   </tr>
@@ -249,17 +249,17 @@ const jsonLd = [
 
         <!-- Alternatives comparison -->
         <section id="alternatives" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">{company.name} vs alternatives</h2>
-          <p class="text-slate-600 mb-4 text-sm">How {company.name} compares to the other top {NICHE.label} {NICHE.providersLabel}.</p>
-          <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">{company.name} vs alternatives</h2>
+          <p class="text-zinc-300 mb-4 text-sm">How {company.name} compares to the other top {NICHE.label} {NICHE.providersLabel}.</p>
+          <div class="overflow-x-auto rounded-xl border border-zinc-700">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200">
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Key difference</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Rating</th>
-                  <th class="text-left px-4 py-3 font-semibold text-slate-700">Compare</th>
+                <tr class="bg-zinc-900 border-b border-zinc-700">
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Best for</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Key difference</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Rating</th>
+                  <th class="text-left px-4 py-3 font-semibold text-zinc-200">Compare</th>
                 </tr>
               </thead>
               <tbody>
@@ -269,16 +269,16 @@ const jsonLd = [
                          (c.slug2 === company.slug && c.slug1 === alt.slug)
                   )?.slug;
                   return (
-                    <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
+                    <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
                       <td class="px-4 py-3 font-medium">
-                        <a href={`/companies/${alt.slug}/`} class="text-brand-600 hover:underline">{alt.name}</a>
+                        <a href={`/companies/${alt.slug}/`} class="text-brand-400 hover:underline">{alt.name}</a>
                       </td>
-                      <td class="px-4 py-3 text-slate-600 text-xs">{truncateWords(alt.bestFor, 8)}</td>
-                      <td class="px-4 py-3 text-slate-600 text-xs">{alt.primaryDifferentiator}</td>
-                      <td class="px-4 py-3 text-slate-700 font-semibold">{alt.rating.toFixed(1)}</td>
+                      <td class="px-4 py-3 text-zinc-300 text-xs">{truncateWords(alt.bestFor, 8)}</td>
+                      <td class="px-4 py-3 text-zinc-300 text-xs">{alt.primaryDifferentiator}</td>
+                      <td class="px-4 py-3 text-zinc-200 font-semibold">{alt.rating.toFixed(1)}</td>
                       <td class="px-4 py-3">
                         {compSlug && (
-                          <a href={`/comparisons/${compSlug}/`} class="text-xs text-brand-600 hover:underline whitespace-nowrap">
+                          <a href={`/comparisons/${compSlug}/`} class="text-xs text-brand-400 hover:underline whitespace-nowrap">
                             Full comparison
                           </a>
                         )}
@@ -290,7 +290,7 @@ const jsonLd = [
             </table>
           </div>
           <div class="mt-4">
-            <a href={`/alternatives/${company.slug}/`} class="text-sm font-semibold text-brand-600 hover:underline">
+            <a href={`/alternatives/${company.slug}/`} class="text-sm font-semibold text-brand-400 hover:underline">
               See all {company.name} alternatives
             </a>
           </div>
@@ -298,15 +298,15 @@ const jsonLd = [
 
         <!-- FAQ -->
         <section id="faq" class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-6">{company.name} FAQ</h2>
+          <h2 class="text-xl font-bold text-zinc-50 mb-6">{company.name} FAQ</h2>
           <div class="space-y-5">
-            <div class="border-b border-slate-100 pb-5">
-              <h3 class="font-semibold text-slate-900 mb-2">What is {company.name}?</h3>
-              <p class="text-sm text-slate-600">{company.tagline}</p>
+            <div class="border-b border-zinc-800 pb-5">
+              <h3 class="font-semibold text-zinc-50 mb-2">What is {company.name}?</h3>
+              <p class="text-sm text-zinc-300">{company.tagline}</p>
             </div>
-            <div class="border-b border-slate-100 pb-5">
-              <h3 class="font-semibold text-slate-900 mb-2">How much does {company.name} charge?</h3>
-              <p class="text-sm text-slate-600">
+            <div class="border-b border-zinc-800 pb-5">
+              <h3 class="font-semibold text-zinc-50 mb-2">How much does {company.name} charge?</h3>
+              <p class="text-sm text-zinc-300">
                 {company.name} uses {company.pricingModel.toLowerCase()} pricing.
                 {!isUndisclosedMinimum(company.minimumEngagement)
                   ? `Minimum engagement starts at ${company.minimumEngagement}. `
@@ -314,45 +314,45 @@ const jsonLd = [
                 A discovery call is required to get project-specific quotes.
               </p>
             </div>
-            <div class="border-b border-slate-100 pb-5">
-              <h3 class="font-semibold text-slate-900 mb-2">What tech stack does {company.name} use?</h3>
-              <p class="text-sm text-slate-600">
+            <div class="border-b border-zinc-800 pb-5">
+              <h3 class="font-semibold text-zinc-50 mb-2">What tech stack does {company.name} use?</h3>
+              <p class="text-sm text-zinc-300">
                 {company.name} works with {company.techStack.join(', ')}.
                 Primary industries served include {company.industries.join(', ')}.
               </p>
             </div>
-            <div class="border-b border-slate-100 pb-5">
-              <h3 class="font-semibold text-slate-900 mb-2">Is {company.name} right for enterprise?</h3>
-              <p class="text-sm text-slate-600">
+            <div class="border-b border-zinc-800 pb-5">
+              <h3 class="font-semibold text-zinc-50 mb-2">Is {company.name} right for enterprise?</h3>
+              <p class="text-sm text-zinc-300">
                 {stripTrailingPeriods(company.bestFor)}. {company.teamSize} team size.
                 {company.cons[0] ? `Key consideration: ${stripTrailingPeriods(company.cons[0])}.` : ''}
               </p>
             </div>
             <div class="pb-5">
-              <h3 class="font-semibold text-slate-900 mb-2">What are the best {company.name} alternatives?</h3>
-              <p class="text-sm text-slate-600 mb-2">
+              <h3 class="font-semibold text-zinc-50 mb-2">What are the best {company.name} alternatives?</h3>
+              <p class="text-sm text-zinc-300 mb-2">
                 The best alternatives to {company.name} depend on your use case. Top options are:
               </p>
-              <ul class="text-sm text-slate-600 space-y-1">
+              <ul class="text-sm text-zinc-300 space-y-1">
                 {others.slice(0, 3).map(alt => (
-                  <li><a href={`/companies/${alt.slug}/`} class="text-brand-600 hover:underline">{alt.name}</a>: {alt.primaryDifferentiator.toLowerCase()}</li>
+                  <li><a href={`/companies/${alt.slug}/`} class="text-brand-400 hover:underline">{alt.name}</a>: {alt.primaryDifferentiator.toLowerCase()}</li>
                 ))}
               </ul>
-              <a href={`/alternatives/${company.slug}/`} class="mt-2 inline-block text-sm text-brand-600 hover:underline">See full alternatives list</a>
+              <a href={`/alternatives/${company.slug}/`} class="mt-2 inline-block text-sm text-brand-400 hover:underline">See full alternatives list</a>
             </div>
           </div>
         </section>
 
         <!-- Related comparisons -->
         <section class="mb-10">
-          <h2 class="text-xl font-bold text-slate-900 mb-4">Compare {company.name} with other {NICHE.label} {NICHE.providersLabel}</h2>
+          <h2 class="text-xl font-bold text-zinc-50 mb-4">Compare {company.name} with other {NICHE.label} {NICHE.providersLabel}</h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {myComparisons.map(c => {
               const other = c.slug1 === company.slug
                 ? companies.find(co => co.slug === c.slug2)!
                 : companies.find(co => co.slug === c.slug1)!;
               return (
-                <a href={`/comparisons/${c.slug}/`} class="border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-colors">
+                <a href={`/comparisons/${c.slug}/`} class="border border-zinc-700 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-200 hover:border-brand-800 hover:text-brand-400 hover:bg-brand-900/30 transition-colors">
                   {company.name} vs {other.name}
                 </a>
               );
@@ -360,65 +360,65 @@ const jsonLd = [
           </div>
         </section>
 
-        <p class="text-xs text-slate-400 border-t border-slate-100 pt-4 mt-6">
+        <p class="text-xs text-zinc-500 border-t border-zinc-800 pt-4 mt-6">
           Verify all details directly with {company.name} before making a decision.
         </p>
       </div>
 
       <!-- SIDEBAR -->
       <aside class="lg:col-span-1 mb-8 lg:mb-0 order-first lg:order-last">
-        <div class="bg-white border border-slate-200 rounded-xl p-5 sticky top-20">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-xl p-5 sticky top-20">
           <div class="text-center mb-4">
-            <div class="w-16 h-16 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xl mx-auto mb-2">
+            <div class="w-16 h-16 rounded-xl bg-brand-900/50 text-brand-300 flex items-center justify-center font-bold text-xl mx-auto mb-2">
               {company.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
             </div>
-            <p class="font-bold text-slate-900">{company.name}</p>
-            <p class="text-xs text-slate-500">{company.hq}</p>
+            <p class="font-bold text-zinc-50">{company.name}</p>
+            <p class="text-xs text-zinc-400">{company.hq}</p>
           </div>
 
-          <div class="flex items-center justify-center gap-2 mb-5 pb-4 border-b border-slate-100">
+          <div class="flex items-center justify-center gap-2 mb-5 pb-4 border-b border-zinc-800">
             <StarRating rating={company.rating} />
-            <span class="font-bold text-slate-900">{company.rating.toFixed(1)}</span>
-            <span class="text-xs text-slate-400">/ 5</span>
+            <span class="font-bold text-zinc-50">{company.rating.toFixed(1)}</span>
+            <span class="text-xs text-zinc-500">/ 5</span>
           </div>
 
           <dl class="space-y-3 text-sm mb-5">
             <div>
-              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Best for</dt>
-              <dd class="text-slate-700 text-xs leading-relaxed">{company.bestFor}</dd>
+              <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-0.5">Best for</dt>
+              <dd class="text-zinc-200 text-xs leading-relaxed">{company.bestFor}</dd>
             </div>
             <div>
-              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Pricing</dt>
-              <dd class="text-slate-700 text-xs">{company.pricingModel}</dd>
+              <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-0.5">Pricing</dt>
+              <dd class="text-zinc-200 text-xs">{company.pricingModel}</dd>
             </div>
             <div>
-              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Min. engagement</dt>
-              <dd class="text-slate-700 text-xs">{company.minimumEngagement}</dd>
+              <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-0.5">Min. engagement</dt>
+              <dd class="text-zinc-200 text-xs">{company.minimumEngagement}</dd>
             </div>
             <div>
-              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Founded</dt>
-              <dd class="text-slate-700 text-xs">{company.founded}</dd>
+              <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-0.5">Founded</dt>
+              <dd class="text-zinc-200 text-xs">{company.founded}</dd>
             </div>
             <div>
-              <dt class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">Team size</dt>
-              <dd class="text-slate-700 text-xs">{company.teamSize}</dd>
+              <dt class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-0.5">Team size</dt>
+              <dd class="text-zinc-200 text-xs">{company.teamSize}</dd>
             </div>
           </dl>
 
           <div class="mb-4">
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Key capabilities</p>
+            <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-2">Key capabilities</p>
             <div class="flex flex-wrap gap-1.5">
               {company.badges.map(b => (
-                <span class="text-xs bg-brand-50 text-brand-700 border border-brand-100 px-2 py-0.5 rounded font-medium">{b}</span>
+                <span class="text-xs bg-brand-900/30 text-brand-300 border border-brand-800 px-2 py-0.5 rounded font-medium">{SERVICE_LABELS[b] ?? b}</span>
               ))}
             </div>
           </div>
 
           <div class="mb-5">
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Tech stack</p>
+            <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-2">Tech stack</p>
             <div class="flex flex-wrap gap-1.5">
               {company.techStack.slice(0, 5).map(t => (
-                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{t}</span>
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{t}</span>
               ))}
             </div>
           </div>
@@ -427,13 +427,13 @@ const jsonLd = [
             href={company.website}
             target="_blank"
             rel="noopener noreferrer nofollow"
-            class="block w-full text-center bg-brand-600 text-white font-semibold py-2.5 rounded-lg hover:bg-brand-700 transition-colors text-sm mb-3"
+            class="block w-full text-center bg-brand-500 text-zinc-950 font-semibold py-2.5 rounded-lg hover:bg-brand-400 transition-colors text-sm mb-3"
           >
             Visit {company.name}
           </a>
           <a
             href={`/alternatives/${company.slug}/`}
-            class="block w-full text-center border border-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors text-sm"
+            class="block w-full text-center border border-zinc-600 text-zinc-200 font-semibold py-2.5 rounded-lg hover:border-brand-800 hover:text-brand-400 transition-colors text-sm"
           >
             See alternatives
           </a>

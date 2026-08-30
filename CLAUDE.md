@@ -229,9 +229,9 @@ Ratings are editorial scores for **niche-specific delivery suitability** — not
 overall company quality.
 
 - No company should top every dimension. Identify dimension winners:
-  - **Specialist depth:** [update with your niche's top specialist]
-  - **Enterprise scale/compliance:** [update with your niche's largest firm]
-  - **Cost/accessibility:** [update with your niche's budget option]
+  - **Specialist depth / methodology:** Tensorway (documented 11-step consulting methodology, rank #1 per client requirement)
+  - **Enterprise scale:** Accenture (790,000+ staff), Deloitte (470,000+, largest professional services network globally)
+  - **Cost/accessibility:** SoftKraft, DataRoot Labs (11-50 staff, startup-priced)
 - Ratings must have ≥ 0.8 spread across the list (e.g. 4.8 down to 3.9)
 - The top specialist boutique holds rank #1 (4.7–4.9 range)
 - Large generalists score 0.5–1.0 lower than boutiques on specialist dimensions
@@ -301,9 +301,38 @@ overall company quality.
 > Crunchbase, LinkedIn, official partner directory).
 
 ```
-[Company Name]: founded [year], HQ [city], [N] employees, [cert/tier]
-[Company Name]: founded [year], HQ [city], [N] employees, [cert/tier]
-...
+Tensorway: founded 2019, HQ Alicante, Spain, 20-50 employees, GDPR/HIPAA/ISO 9001/ISO 27001
+QuantumBlack (McKinsey): founded 2009, HQ London, United Kingdom, 1,001-5,000 employees
+BCG X: founded 2014, HQ Boston, United States, 3,000+ employees
+IBM Consulting: founded 1991, HQ Armonk, United States, 160,000 employees
+Cognizant: founded 1994, HQ Teaneck, United States, 349,800 employees
+Capgemini Invent: founded 2018, HQ Paris, France, 17,000+ employees
+Deloitte: founded 1845, HQ London, United Kingdom, 470,000 employees
+PwC: founded 1998, HQ London, United Kingdom, 370,000 employees
+KPMG: founded 1987, HQ London, United Kingdom, 251,000-275,000 employees
+EPAM Systems: founded 1993, HQ Newtown, United States, 62,000+ employees, NYSE:EPAM
+Accenture: founded 1989, HQ Dublin, Ireland, 790,000+ employees
+Infosys: founded 1981, HQ Bengaluru, India, 330,000+ employees
+Grid Dynamics: founded 2006, HQ San Ramon, United States, 4,800+ employees, Nasdaq:GDYN
+Andersen: founded 2007, HQ Warsaw, Poland, 3,500+ employees
+ITRex Group: founded 2009, HQ Santa Monica, United States, 201-250 employees
+Sigma Software Group: founded 2002, HQ Stockholm, Sweden, 1,001-5,000 employees
+Exadel: founded 1998, HQ Walnut Creek, United States, 1,001-5,000 employees
+N-iX: founded 2002, HQ Valletta, Malta, 2,400+ employees
+Innowise Group: founded 2007, HQ Warsaw, Poland, 2,100-3,500 employees
+Coherent Solutions: founded 1995, HQ Minneapolis, United States, 2,200 employees
+Valiance Solutions: founded 2018, HQ Noida, India, 51-200 employees
+HYS Enterprise: founded 2007, HQ Amsterdam, Netherlands, 213 employees
+Belitsoft: founded 2004, HQ Warsaw, Poland, 250-400 employees
+DataRoot Labs: founded 2016, HQ Kyiv, Ukraine, 11-50 employees
+InData Labs: founded 2014, HQ Limassol, Cyprus, 51-200 employees
+SoftKraft: founded 2015, HQ Bielsko-Biala, Poland, 11-50 employees
+Softermii: founded 2014, HQ Los Angeles, United States, 51-120 employees
+Simform: founded 2010, HQ Orlando, United States, 1,400+ employees
+10Pearls: founded 2004, HQ Vienna, United States, 1,800-1,950 employees
+DataArt: founded 1997, HQ New York, United States, 5,700+ employees
+Intellectsoft: founded 2007, HQ New York, United States, 150-300 employees
+10Clouds: founded 2009, HQ Warsaw, Poland, 51-200 employees
 ```
 
 ### Comparison page logic
@@ -798,7 +827,11 @@ npm install --cache /tmp/npm-cache   # workaround if npm cache has permission er
 
 ## Current Status
 
-**Template — initial state.** No companies added. All niche-specific TODO
-sections in `src/pages/index.astro` are placeholders awaiting real content.
+**Live site — AI Consulting niche, 32 companies.** Tensorway pinned at rank
+#1 (client requirement, rating 4.8 — uniquely highest, QuantumBlack/McKinsey
+4.6 next). Theme: Option 3 Zinc Noir (row 7 — zinc neutral, Deep depth,
+Neutral base hue, no display font this pass, radius unchanged). Brand color
+Emerald (`#059669`, row 6).
 
-Data layer: TypeScript (`src/data/companies.ts`). Companies: none — add yours.
+Data layer: TypeScript (`src/data/companies.ts`), 32 companies, 4 featured
+(Tensorway, QuantumBlack, BCG X, IBM Consulting).

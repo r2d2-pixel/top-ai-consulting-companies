@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import StarRating from '../components/StarRating.astro';
 import { companies, getComparisons } from '../data/companies';
 import { SITE, NICHE } from '../config';
+import { SERVICE_LABELS } from '../lib/companies';
 
 const comparisons = getComparisons();
 const year = new Date().getFullYear();
@@ -14,17 +15,6 @@ function truncateWords(s: string, n: number): string {
   const clean = s.replace(/\.+$/, '');
   const words = clean.split(' ');
   return words.length > n ? words.slice(0, n).join(' ') + '...' : clean + '.';
-}
-
-// Reduce a possibly multi-clause bestFor ("X, not Y" / "X, Y and Z") to its
-// first clause only, for the "Best for X:" quick-answer line — the full
-// multi-clause bestFor is fine in table cells but reads as a run-on,
-// AI-generated sentence in this single-line format.
-function bestForShort(s: string): string {
-  const first = s.split(',')[0].trim().replace(/\.$/, '');
-  return /^[A-Z][a-z0-9-]*$/.test(first.split(' ')[0])
-    ? first.charAt(0).toLowerCase() + first.slice(1)
-    : first;
 }
 
 // Title Case for the homepage <title>/H1 only — NICHE.providersLabel is stored
@@ -40,6 +30,18 @@ const providersLabelTC = titleCase(NICHE.providersLabel);
 // Top-rated companies used in featured profiles section
 const featuredProfiles = [...companies].sort((a, b) => b.rating - a.rating).slice(0, 10);
 
+// Hand-curated, non-overlapping "Best for X" categories for the quick-answer
+// box — top-rated company is always "overall"; the other 5 cover genuinely
+// distinct real differentiators from this list.
+const quickAnswerPicks: { slug: string; label: string }[] = [
+  { slug: "tensorway", label: "overall" },
+  { slug: "quantumblack", label: "board-level strategy credibility" },
+  { slug: "ibm-consulting", label: "existing IBM watsonx environments" },
+  { slug: "n-ix", label: "named enterprise clients like Bosch and Siemens" },
+  { slug: "valiance-solutions", label: "government and public-sector engagements" },
+  { slug: "softkraft", label: "startup budgets" },
+];
+
 // All unique engagement models across companies — auto-generates table columns so they always match the data
 const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModels))].sort();
 ---
@@ -51,22 +53,22 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
 >
 
   <!-- HERO -->
-  <section class="bg-slate-50 border-b border-slate-200 py-14 sm:py-20">
+  <section class="bg-zinc-900 border-b border-zinc-700 py-14 sm:py-20">
     <div class="mx-auto max-w-4xl px-4 sm:px-6 text-center">
-      <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-4">
+      <h1 class="text-4xl sm:text-5xl font-bold text-zinc-50 leading-tight mb-4">
         Best {NICHE.label} {providersLabelTC} in {year}
       </h1>
-      <p class="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto mb-6">
+      <p class="text-lg sm:text-xl text-zinc-300 max-w-2xl mx-auto mb-6">
         Independent reviews of {companies.length} {NICHE.providersLabel} selected for verified delivery track records, technical expertise, and transparent pricing data.
       </p>
       <div class="flex flex-wrap gap-3 justify-center mb-6">
-        <a href="#comparison-table" class="bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors">
+        <a href="#comparison-table" class="bg-brand-500 text-zinc-950 font-semibold px-6 py-3 rounded-lg hover:bg-brand-400 transition-colors">
           Compare all {NICHE.providersLabel}
         </a>
       </div>
-      <div class="flex flex-wrap gap-3 justify-center text-xs text-slate-500">
-        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full">{companies.length} {NICHE.providersLabel} reviewed</span>
-        <span class="bg-white border border-slate-200 px-3 py-1 rounded-full">Independent editorial</span>
+      <div class="flex flex-wrap gap-3 justify-center text-xs text-zinc-400">
+        <span class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded-full">{companies.length} {NICHE.providersLabel} reviewed</span>
+        <span class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded-full">Independent editorial</span>
       </div>
     </div>
   </section>
@@ -74,61 +76,54 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
 
     <!-- QUICK ANSWER BOX -->
-    <!-- TODO: once real company data exists, replace the mechanical
-         featuredProfiles.slice(0, 6) + bestForShort() derivation below with a
-         hand-curated `quickAnswerPicks: { slug: string; label: string }[]`
-         array (top-rated company = label "overall", 5 more distinct,
-         non-overlapping "Best for X" picks). bestForShort() only prevents
-         "Best for X, not Y:" grammar — it does NOT prevent two companies
-         both truncating to the same word (e.g. two "fintech" specialists
-         both landing on "Best for fintech:"). See create-reviewer-site.md
-         Phase 4f "Quick-answer box must be hand-curated" for the exact
-         pattern and rationale (confirmed 2026-08-13). -->
-    <div class="bg-brand-50 border border-brand-200 rounded-xl p-6 mb-12">
-      <h2 class="text-lg font-bold text-slate-900 mb-3">Which {NICHE.label} {NICHE.providerLabel} is best?</h2>
-      <p class="text-sm text-slate-600 mb-3">Short answer: the right choice depends on your project size, budget, and specific requirements.</p>
-      <ul class="space-y-2 text-sm text-slate-700">
-        {featuredProfiles.slice(0, 6).map(c => (
-          <li>
-            <span class="font-semibold">Best for {bestForShort(c.bestFor)}:</span>{' '}
-            <a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a>
-            {' '}— {c.primaryDifferentiator}
-          </li>
-        ))}
+    <div class="bg-brand-900/30 border border-brand-800 rounded-xl p-6 mb-12">
+      <h2 class="text-lg font-bold text-zinc-50 mb-3">Which {NICHE.label} {NICHE.providerLabel} is best?</h2>
+      <p class="text-sm text-zinc-300 mb-3">Short answer: the right choice depends on whether you need strategy, implementation, or both, plus your budget and industry.</p>
+      <ul class="space-y-2 text-sm text-zinc-200">
+        {quickAnswerPicks.map(pick => {
+          const c = companies.find(co => co.slug === pick.slug)!;
+          return (
+            <li>
+              <span class="font-semibold">Best {pick.label === 'overall' ? 'overall' : `for ${pick.label}`}:</span>{' '}
+              <a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a>
+              {': '}{c.primaryDifferentiator}
+            </li>
+          );
+        })}
       </ul>
     </div>
 
     <!-- TABLE 1: MASTER COMPARISON -->
     <section id="comparison-table" class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">How do the top {NICHE.label} {NICHE.providersLabel} compare?</h2>
-      <p class="text-slate-600 mb-6 text-sm">The table below covers all {companies.length} reviewed {NICHE.providersLabel}.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">How do the top {NICHE.label} {NICHE.providersLabel} compare?</h2>
+      <p class="text-zinc-300 mb-6 text-sm">The table below covers all {companies.length} reviewed {NICHE.providersLabel}.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm table-fixed">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-[16%]">Company</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-[30%]">Best for</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-[22%]">Pricing model</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-[18%]">Min. engagement</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 w-[14%]">Rating</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-[16%]">Company</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-[30%]">Best for</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-[22%]">Pricing model</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-[18%]">Min. engagement</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 w-[14%]">Rating</th>
             </tr>
           </thead>
           <tbody>
             {companies.map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 transition-colors ${c.featured ? 'border-l-4 border-l-brand-600 bg-brand-50/40' : ''}`}>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 transition-colors ${c.featured ? 'border-l-4 border-l-brand-500 bg-brand-900/30' : ''}`}>
                 <td class="px-4 py-3">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <a href={`/companies/${c.slug}/`} class="font-semibold text-brand-600 hover:underline">{c.name}</a>
-                    {c.featured && <span class="text-xs bg-brand-600 text-white px-2 py-0.5 rounded-full">Editor's pick</span>}
+                  <div class="flex flex-col items-start gap-1">
+                    <a href={`/companies/${c.slug}/`} class="font-semibold text-brand-400 hover:underline">{c.name}</a>
+                    {c.featured && <span class="text-xs bg-brand-500 text-zinc-950 px-2 py-0.5 rounded-full">Editor's pick</span>}
                   </div>
                 </td>
-                <td class="px-4 py-3 text-slate-600">{c.bestFor}</td>
-                <td class="px-4 py-3 text-slate-600">{c.pricingModel}</td>
-                <td class="px-4 py-3 text-slate-600">{c.minimumEngagement}</td>
+                <td class="px-4 py-3 text-zinc-300">{c.bestFor}</td>
+                <td class="px-4 py-3 text-zinc-300">{c.pricingModel}</td>
+                <td class="px-4 py-3 text-zinc-300">{c.minimumEngagement}</td>
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div class="flex items-center gap-1.5">
                     <StarRating rating={c.rating} />
-                    <span class="font-semibold text-slate-900">{c.rating.toFixed(1)}</span>
+                    <span class="font-semibold text-zinc-50">{c.rating.toFixed(1)}</span>
                   </div>
                 </td>
               </tr>
@@ -139,39 +134,32 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- SEO PROSE 1: WHAT MAKES A GOOD PROVIDER -->
-    <!-- TODO — MUST REWRITE, not just skim-approve: the 3 paragraphs below
-         read as plausible finished copy, which is exactly why they shipped
-         unedited on 10+ live sites (confirmed 2026-08-13, see
-         create-reviewer-site.md Phase 4f "Homepage SEO prose must be
-         independently written"). Placeholder text is generic advice that
-         fits ANY niche — that's the tell it wasn't rewritten. Same
-         requirement applies to SEO PROSE 2 and SEO PROSE 3 below. -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">What makes a good {NICHE.label} {NICHE.providerLabel}?</h2>
-      <div class="prose-custom max-w-none text-sm text-slate-700 space-y-4">
-        <p>The single most important distinction is whether {NICHE.label} is the firm's core business or a capability added to an existing portfolio. Specialist firms built their teams, tooling, and delivery workflows around {NICHE.label} from the start. Generalist firms that added a {NICHE.label} practice often staff it with people transitioning from other roles; the delivery quality gap shows most clearly in production, not in demos.</p>
-        <p>Technical depth is a reliable proxy for expertise. A firm that can discuss the specific trade-offs between different approaches and name the tools they used on their last three production projects has built real systems. A firm that describes its approach in generic marketing terms has not demonstrated the same specificity. Ask vendors which specific tools or techniques they used on their last three projects and why.</p>
-        <p>The engagement model shapes the project's risk profile as much as the technical approach. Fixed-price contracts work when requirements are well-defined; they create problems when they are not. The best due diligence question: can you show a case study where you delivered a complete project to production, including how you handled issues after launch?</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">What makes a good {NICHE.label} {NICHE.providerLabel}?</h2>
+      <div class="prose-custom max-w-none text-sm text-zinc-200 space-y-4">
+        <p>A consultancy's actual product is judgment, not code. Anyone can propose a generative AI pilot; the harder skill is telling a client which of their ten proposed use cases will actually return more than it costs, and which are interesting demos that will never survive contact with production data. The firms worth shortlisting can point to a specific project they talked a client out of.</p>
+        <p>Vendor independence matters more here than in almost any other technology category. A consultancy that's also selling implementation hours, or that's tied to one cloud platform's AI stack, has a built-in incentive to recommend the solution it happens to sell. That doesn't make the advice wrong, but it changes how much scrutiny the recommendation deserves. Ask directly: would you recommend a smaller, cheaper approach if that were genuinely the right call, even if it meant less work for your team?</p>
+        <p>Strategy work that never touches implementation is close to worthless. A roadmap document is not a deliverable if nobody checks whether the assumptions behind it survive contact with the client's actual data infrastructure. The firms that produce useful strategy either build a working pilot before finalizing recommendations, or hand off to an implementation team with a documented, testable technical plan, not a slide deck.</p>
       </div>
     </section>
 
     <!-- TABLE: TECH STACK BY COMPANY -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">What tech stack does each {NICHE.providerLabel} use?</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: specialists typically cover more tools than generalists. Check each profile for full tech stack details.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">What tech stack does each {NICHE.providerLabel} use?</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: specialists typically cover more tools than generalists. Check each profile for full tech stack details.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Company</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Primary tech stack</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 whitespace-nowrap">Company</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Primary tech stack</th>
             </tr>
           </thead>
           <tbody>
             {companies.map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                <td class="px-4 py-3 text-slate-600">{c.techStack.slice(0, 5).join(', ')}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                <td class="px-4 py-3 text-zinc-300">{c.techStack.slice(0, 5).join(', ')}</td>
               </tr>
             ))}
           </tbody>
@@ -180,82 +168,81 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- HOW WE SELECTED -->
-    <!-- TODO: Replace these criteria with criteria relevant to your niche -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">How we selected these {NICHE.label} {NICHE.providersLabel}</h2>
-      <p class="text-slate-600 mb-3 text-sm">Each {NICHE.providerLabel} in this list was selected based on verifiable signals, not marketing claims. The criteria used for selection in {year} are:</p>
-      <ul class="list-disc list-inside space-y-2 text-sm text-slate-600">
-        <li><strong>Verified delivery track record:</strong> Named case studies or independently confirmed client references in {NICHE.label} projects</li>
-        <li><strong>Technical specificity:</strong> Demonstrated use of named tools and frameworks; not just generic claims</li>
-        <li><strong>Engagement model transparency:</strong> At least one public or disclosed engagement model with enough pricing context to plan a project</li>
-        <li><strong>Team composition:</strong> Evidence of dedicated specialists, not a repositioned generalist team</li>
-        <li><strong>Reviews and ratings:</strong> Where available, used as a secondary signal alongside editorial assessment</li>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">How we selected these {NICHE.label} {NICHE.providersLabel}</h2>
+      <p class="text-zinc-300 mb-3 text-sm">Each {NICHE.providerLabel} in this list was selected based on verifiable signals, not marketing claims. The criteria used for selection in {year} are:</p>
+      <ul class="list-disc list-inside space-y-2 text-sm text-zinc-300">
+        <li><strong>Advisory independence:</strong> Evidence the firm has recommended against a project or a specific platform, not just for one</li>
+        <li><strong>Documented methodology:</strong> A named, repeatable process for assessment and prioritization, not a one-off proposal template</li>
+        <li><strong>Strategy-to-build continuity:</strong> A clear path from recommendation to implementation, whether in-house or through a disclosed handoff</li>
+        <li><strong>Named enterprise engagements:</strong> Verifiable clients or case studies, not just logos on a homepage</li>
+        <li><strong>Engagement transparency:</strong> At least one disclosed engagement model with enough pricing context to plan a project</li>
       </ul>
     </section>
 
     <!-- COMPANY PROFILES -->
     <section id="all-profiles" class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Best {NICHE.label} {NICHE.providersLabel} in {year}</h2>
-      <p class="text-slate-600 mb-8 text-sm">Featured profiles for the top-rated {NICHE.providersLabel}. Full reviews available for all {companies.length} {NICHE.providersLabel} via their profile pages.</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Best {NICHE.label} {NICHE.providersLabel} in {year}</h2>
+      <p class="text-zinc-300 mb-8 text-sm">Featured profiles for the top-rated {NICHE.providersLabel}. Full reviews available for all {companies.length} {NICHE.providersLabel} via their profile pages.</p>
       <div class="space-y-8">
         {featuredProfiles.map((c, i) => (
-          <div class={`border rounded-xl p-6 ${c.featured ? 'border-brand-300 bg-brand-50/30' : 'border-slate-200'}`}>
+          <div class={`border rounded-xl p-6 ${c.featured ? 'border-brand-800 bg-brand-900/30' : 'border-zinc-700'}`}>
             <div class="flex items-start justify-between gap-4 flex-wrap mb-3">
               <div>
                 <div class="flex items-center gap-3 mb-1">
-                  <h3 class="text-xl font-bold text-slate-900">
-                    <a href={`/companies/${c.slug}/`} class="hover:text-brand-600">{i + 1}. {c.name}</a>
+                  <h3 class="text-xl font-bold text-zinc-50">
+                    <a href={`/companies/${c.slug}/`} class="hover:text-brand-400">{i + 1}. {c.name}</a>
                   </h3>
-                  {c.featured && <span class="text-xs bg-brand-600 text-white px-2 py-0.5 rounded-full shrink-0">Editor's pick</span>}
+                  {c.featured && <span class="text-xs bg-brand-500 text-zinc-950 px-2 py-0.5 rounded-full shrink-0">Editor's pick</span>}
                 </div>
-                <p class="text-sm text-slate-500 italic">{c.tagline}</p>
+                <p class="text-sm text-zinc-400 italic">{c.tagline}</p>
               </div>
               <div class="flex items-center gap-2 shrink-0">
                 <StarRating rating={c.rating} />
-                <span class="font-bold text-slate-900">{c.rating.toFixed(1)}</span>
+                <span class="font-bold text-zinc-50">{c.rating.toFixed(1)}</span>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-xs text-slate-600">
-              <div><span class="font-semibold text-slate-500 block">Founded</span>{c.founded}</div>
-              <div><span class="font-semibold text-slate-500 block">HQ</span>{c.hq}</div>
-              <div><span class="font-semibold text-slate-500 block">Team size</span>{c.teamSize}</div>
-              <div><span class="font-semibold text-slate-500 block">Min. engagement</span>{c.minimumEngagement}</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 text-xs text-zinc-300">
+              <div><span class="font-semibold text-zinc-400 block">Founded</span>{c.founded}</div>
+              <div><span class="font-semibold text-zinc-400 block">HQ</span>{c.hq}</div>
+              <div><span class="font-semibold text-zinc-400 block">Team size</span>{c.teamSize}</div>
+              <div><span class="font-semibold text-zinc-400 block">Min. engagement</span>{c.minimumEngagement}</div>
             </div>
 
-            <p class="text-sm text-slate-700 mb-4">{c.description}</p>
+            <p class="text-sm text-zinc-200 mb-4">{c.description}</p>
 
             <div class="flex flex-wrap gap-1.5 mb-4">
               {c.techStack.slice(0, 6).map(t => (
-                <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{t}</span>
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{t}</span>
               ))}
             </div>
 
             <div class="grid sm:grid-cols-2 gap-4 mb-4 text-sm">
               <div>
-                <p class="font-semibold text-slate-700 mb-1">Advantages</p>
+                <p class="font-semibold text-zinc-200 mb-1">Advantages</p>
                 <ul class="space-y-1">
                   {c.pros.slice(0, 3).map(p => (
-                    <li class="flex items-start gap-1.5 text-slate-600"><span class="text-green-600 font-bold shrink-0">+</span>{p}</li>
+                    <li class="flex items-start gap-1.5 text-zinc-300"><span class="text-green-400 font-bold shrink-0">+</span>{p}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <p class="font-semibold text-slate-700 mb-1">Things to consider</p>
+                <p class="font-semibold text-zinc-200 mb-1">Things to consider</p>
                 <ul class="space-y-1">
                   {c.cons.map(con => (
-                    <li class="flex items-start gap-1.5 text-slate-600"><span class="text-red-400 font-bold shrink-0">-</span>{con}</li>
+                    <li class="flex items-start gap-1.5 text-zinc-300"><span class="text-red-400 font-bold shrink-0">-</span>{con}</li>
                   ))}
                 </ul>
               </div>
             </div>
 
             <div class="flex items-center justify-between flex-wrap gap-3">
-              <p class="text-xs text-slate-500"><span class="font-semibold">Best for:</span> {c.bestFor}</p>
+              <p class="text-xs text-zinc-400"><span class="font-semibold">Best for:</span> {c.bestFor}</p>
               <div class="flex gap-2">
-                <a href={`/companies/${c.slug}/`} class="text-sm font-semibold text-brand-600 hover:underline">Full review</a>
-                <span class="text-slate-300">|</span>
-                <a href={c.website} target="_blank" rel="noopener noreferrer nofollow" class="text-sm font-semibold text-slate-600 hover:text-brand-600">Visit website</a>
+                <a href={`/companies/${c.slug}/`} class="text-sm font-semibold text-brand-400 hover:underline">Full review</a>
+                <span class="text-zinc-600">|</span>
+                <a href={c.website} target="_blank" rel="noopener noreferrer nofollow" class="text-sm font-semibold text-zinc-300 hover:text-brand-400">Visit website</a>
               </div>
             </div>
           </div>
@@ -264,28 +251,26 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- TABLE 2: BY USE CASE -->
-    <!-- TODO: Replace the placeholder rows below with real use-case-to-company mappings for your niche.
-         Each row should map a specific buyer use case to the best-fit company with a brief reason. -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Best {NICHE.label} {NICHE.providersLabel} by use case</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: the best {NICHE.providerLabel} depends on your specific use case. The table below maps common use cases to the most suitable firms in {year}.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Best {NICHE.label} {NICHE.providersLabel} by use case</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: the best {NICHE.providerLabel} depends on your specific use case. The table below maps common use cases to the most suitable firms in {year}.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Use case</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Recommended {NICHE.providerLabel}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Why</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Min. engagement</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Use case</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Recommended {NICHE.providerLabel}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Why</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 whitespace-nowrap">Min. engagement</th>
             </tr>
           </thead>
           <tbody>
             {companies.slice(0, 7).map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-800">{c.useCases[0] ?? 'TODO: Add use case'}</td>
-                <td class="px-4 py-3"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                <td class="px-4 py-3 text-slate-600">{c.primaryDifferentiator}</td>
-                <td class="px-4 py-3 text-slate-600">{c.minimumEngagement}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/50' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-100">{c.useCases[0] ?? 'TODO: Add use case'}</td>
+                <td class="px-4 py-3"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                <td class="px-4 py-3 text-zinc-300">{c.primaryDifferentiator}</td>
+                <td class="px-4 py-3 text-zinc-300">{c.minimumEngagement}</td>
               </tr>
             ))}
           </tbody>
@@ -294,50 +279,49 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- TABLE 3: HOW TO CHOOSE -->
-    <!-- TODO: Update criteria to match your niche's key evaluation dimensions -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">How to choose a {NICHE.label} {NICHE.providerLabel}</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: evaluate specialisation depth, technical coverage, delivery ownership model, and engagement model fit before shortlisting vendors.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">How to choose a {NICHE.label} {NICHE.providerLabel}</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: evaluate advisory independence, methodology, strategy-to-build continuity, and engagement transparency before shortlisting vendors.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Criterion</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Why it matters</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">What to check</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Red flag</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Criterion</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Why it matters</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">What to check</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Red flag</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Specialisation depth</td>
-              <td class="px-4 py-3 text-slate-600">Generalist firms repurposing teams produce slower, lower-quality results</td>
-              <td class="px-4 py-3 text-slate-600">Is {NICHE.label} the firm's core business? What share of team is dedicated?</td>
-              <td class="px-4 py-3 text-slate-600">Practice added recently to a legacy firm with no track record</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Advisory independence</td>
+              <td class="px-4 py-3 text-zinc-300">A firm that only sells implementation has an incentive to recommend building something</td>
+              <td class="px-4 py-3 text-zinc-300">Ask for an example where they recommended against a project</td>
+              <td class="px-4 py-3 text-zinc-300">Every past engagement ended in a build recommendation</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Technical coverage</td>
-              <td class="px-4 py-3 text-slate-600">The right tools depend on your project; vendors should cover multiple options</td>
-              <td class="px-4 py-3 text-slate-600">Which specific tools do they use in production projects?</td>
-              <td class="px-4 py-3 text-slate-600">Locked into one vendor or tool with no flexibility</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Documented methodology</td>
+              <td class="px-4 py-3 text-zinc-300">A named, repeatable process produces comparable results across projects; an ad hoc approach doesn't</td>
+              <td class="px-4 py-3 text-zinc-300">Can they describe their assessment process step by step, unprompted?</td>
+              <td class="px-4 py-3 text-zinc-300">Process description is vague or invented on the spot</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Delivery ownership</td>
-              <td class="px-4 py-3 text-slate-600">Staffing platforms require you to provide direction; delivery firms own outcomes</td>
-              <td class="px-4 py-3 text-slate-600">Is this a fixed-output contract or a time-and-materials team?</td>
-              <td class="px-4 py-3 text-slate-600">Firm presents staffing as delivery without clarifying the distinction</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Strategy-to-build continuity</td>
+              <td class="px-4 py-3 text-zinc-300">A roadmap that ignores implementation reality gets thrown out during the build phase</td>
+              <td class="px-4 py-3 text-zinc-300">Do they build a working pilot before finalizing recommendations?</td>
+              <td class="px-4 py-3 text-zinc-300">Deliverable is a slide deck with no technical validation</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Production experience</td>
-              <td class="px-4 py-3 text-slate-600">Building a prototype is different from running a production system</td>
-              <td class="px-4 py-3 text-slate-600">Request case studies showing post-launch monitoring and iteration</td>
-              <td class="px-4 py-3 text-slate-600">Portfolio shows only demos and PoCs, no production systems</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Named enterprise engagements</td>
+              <td class="px-4 py-3 text-zinc-300">Verified engagements distinguish real delivery from marketing-driven case studies</td>
+              <td class="px-4 py-3 text-zinc-300">Are named clients confirmable outside the firm's own materials?</td>
+              <td class="px-4 py-3 text-zinc-300">Case studies name only industries, never specific clients</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Engagement model fit</td>
-              <td class="px-4 py-3 text-slate-600">A fixed-price project on an undefined scope will lead to overruns</td>
-              <td class="px-4 py-3 text-slate-600">Does the engagement model match your requirement certainty?</td>
-              <td class="px-4 py-3 text-slate-600">Vendor pushes fixed-price on a poorly defined scope</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Engagement transparency</td>
+              <td class="px-4 py-3 text-zinc-300">A strategy phase with no defined scope or timeline tends to run indefinitely</td>
+              <td class="px-4 py-3 text-zinc-300">Is there a defined strategy-phase timeline and deliverable?</td>
+              <td class="px-4 py-3 text-zinc-300">Vendor resists committing to a fixed strategy-phase timeline</td>
             </tr>
           </tbody>
         </table>
@@ -345,37 +329,35 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- SEO PROSE 2 -->
-    <!-- TODO — MUST REWRITE, same rule as SEO PROSE 1 above: this reads as
-         finished copy but is generic-niche boilerplate. -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">{NICHE.label} in {year}: what buyers should know</h2>
-      <div class="prose-custom max-w-none text-sm text-slate-700 space-y-4">
-        <p>{NICHE.label} has matured significantly. The market has bifurcated: a small number of specialist firms with deep expertise, and a much larger number of generalist firms with newly formed {NICHE.label} practices of varying depth. The delivery quality gap between the two types shows most clearly in production, not in demos or proposals.</p>
-        <p>Projects cost more than most initial estimates. Scope, integration complexity, and ongoing operational costs all affect total project cost beyond the initial build. A working prototype is not a production system; the difference includes observability tooling, performance optimisation, fallback handling, and a feedback loop for iteration. Buyers who budget only for the prototype often find themselves renegotiating before launch.</p>
-        <p>Custom development makes more sense than off-the-shelf tools when the use case requires proprietary data access, complex multi-step logic, or deep integration with internal systems that lack standard connectors. A capable partner will recommend the right approach for your specific use case rather than defaulting to one solution for all projects.</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">{NICHE.label} in {year}: what buyers should know</h2>
+      <div class="prose-custom max-w-none text-sm text-zinc-200 space-y-4">
+        <p>Buyers frequently confuse an AI consulting engagement with an AI development one, and the confusion is expensive. A consulting engagement should end with a prioritized, tested set of recommendations; a development engagement ends with working software. Some firms genuinely do both well. Others use "consulting" as the entry point to sell a build they'd already decided to recommend before the assessment started.</p>
+        <p>The large global consultancies (McKinsey, BCG, Deloitte, the Big Four) now all run dedicated AI practices with real technical staff behind the brand name, not just partners with slide decks. That changes the calculus for enterprise buyers who previously assumed "consulting firm" meant "no engineering depth." It doesn't mean smaller specialists have nothing left to offer: a boutique firm with a documented methodology and no incentive to sell a build can give more candid advice than a firm whose revenue depends on the recommendation being "build it."</p>
+        <p>Most AI initiatives fail on strategy, not technology. The tooling for building a production language model application is largely solved; picking the wrong use case, or the right use case with the wrong success metric, kills far more projects than a technical limitation does. A consulting engagement's real value is catching that mistake before six months of engineering time gets spent on it.</p>
       </div>
     </section>
 
-    <!-- TABLE 9: ENGAGEMENT MODELS BY COMPANY — columns auto-generated from data -->
+    <!-- TABLE 9: ENGAGEMENT MODELS BY COMPANY (columns auto-generated from data) -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Which engagement models does each {NICHE.providerLabel} offer?</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: most {NICHE.providersLabel} offer more than one engagement model. Use this table to filter by your preferred structure.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Which engagement models does each {NICHE.providerLabel} offer?</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: most {NICHE.providersLabel} offer more than one engagement model. Use this table to filter by your preferred structure.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
               {allEngagementModels.map(m => (
-                <th class="text-center px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">{m}</th>
+                <th class="text-center px-4 py-3 font-semibold text-zinc-200 whitespace-nowrap">{m}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {companies.map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
                 {allEngagementModels.map(m => (
-                  <td class={`px-4 py-3 text-center font-semibold ${c.engagementModels.includes(m) ? 'text-green-600' : 'text-slate-300'}`}>
+                  <td class={`px-4 py-3 text-center font-semibold ${c.engagementModels.includes(m) ? 'text-green-400' : 'text-zinc-600'}`}>
                     {c.engagementModels.includes(m) ? '✓' : '–'}
                   </td>
                 ))}
@@ -387,61 +369,60 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- TABLE 4: PRICING -->
-    <!-- TODO: Update pricing ranges for your niche -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">{NICHE.label} pricing in {year}</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: pricing varies by scope and provider. Contact each {NICHE.providerLabel} directly for project-specific quotes.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">{NICHE.label} pricing in {year}</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: a standalone strategy engagement typically costs less and takes less time than a full build. Contact each {NICHE.providerLabel} directly for project-specific quotes.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Engagement model</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Typical cost range</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Timeline</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Engagement model</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Typical cost range</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Timeline</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Best for</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Fixed project</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add range</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add timeline</td>
-              <td class="px-4 py-3 text-slate-600">Well-defined scope, startup or mid-market</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Strategy / readiness assessment</td>
+              <td class="px-4 py-3 text-zinc-300">$15K – $60K</td>
+              <td class="px-4 py-3 text-zinc-300">3 – 8 weeks</td>
+              <td class="px-4 py-3 text-zinc-300">Use-case prioritization before committing to a build</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Retainer</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add range</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add timeline</td>
-              <td class="px-4 py-3 text-slate-600">Ongoing iterative work</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Retainer</td>
+              <td class="px-4 py-3 text-zinc-300">$8K – $30K / month</td>
+              <td class="px-4 py-3 text-zinc-300">3+ months, ongoing</td>
+              <td class="px-4 py-3 text-zinc-300">Ongoing advisory alongside an internal AI team</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
-              <td class="px-4 py-3 font-medium text-slate-800">Dedicated team</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add range</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add timeline</td>
-              <td class="px-4 py-3 text-slate-600">Large programmes, capability building</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900">
+              <td class="px-4 py-3 font-medium text-zinc-100">Dedicated team</td>
+              <td class="px-4 py-3 text-zinc-300">$10K – $25K / engineer / month</td>
+              <td class="px-4 py-3 text-zinc-300">3+ months</td>
+              <td class="px-4 py-3 text-zinc-300">Strategy work that hands off directly into implementation</td>
             </tr>
-            <tr class="border-b border-slate-100 hover:bg-slate-50 bg-slate-50/50">
-              <td class="px-4 py-3 font-medium text-slate-800">Time and materials</td>
-              <td class="px-4 py-3 text-slate-600">TODO: Add hourly rate</td>
-              <td class="px-4 py-3 text-slate-600">Variable</td>
-              <td class="px-4 py-3 text-slate-600">Exploratory or undefined-scope work</td>
+            <tr class="border-b border-zinc-800 hover:bg-zinc-900 bg-zinc-900/50">
+              <td class="px-4 py-3 font-medium text-zinc-100">Time and materials</td>
+              <td class="px-4 py-3 text-zinc-300">$100 – $250 / hour</td>
+              <td class="px-4 py-3 text-zinc-300">Variable</td>
+              <td class="px-4 py-3 text-zinc-300">Exploratory or undefined-scope advisory work</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- TABLE: MINIMUM ENGAGEMENT BY COMPANY (dynamic — sorted by disclosed minimum) -->
+    <!-- TABLE: MINIMUM ENGAGEMENT BY COMPANY (dynamic, sorted by disclosed minimum) -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Which {NICHE.providerLabel} has the lowest minimum engagement?</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: check each {NICHE.providerLabel}'s profile for current minimum engagement details. Sorted from lowest to highest below.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Which {NICHE.providerLabel} has the lowest minimum engagement?</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: check each {NICHE.providerLabel}'s profile for current minimum engagement details. Sorted from lowest to highest below.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">Minimum engagement</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Best for at this budget</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200 whitespace-nowrap">Minimum engagement</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Best for at this budget</th>
             </tr>
           </thead>
           <tbody>
@@ -449,10 +430,10 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
               const parse = (s: string) => { const m = s.replace(/\D/g,''); return m ? parseInt(m) : 999999; };
               return parse(a.minimumEngagement) - parse(b.minimumEngagement);
             }).map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                <td class="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{c.minimumEngagement}</td>
-                <td class="px-4 py-3 text-slate-600">{truncateWords(c.bestFor, 8)}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                <td class="px-4 py-3 text-zinc-200 font-medium whitespace-nowrap">{c.minimumEngagement}</td>
+                <td class="px-4 py-3 text-zinc-300">{truncateWords(c.bestFor, 8)}</td>
               </tr>
             ))}
           </tbody>
@@ -460,26 +441,25 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
       </div>
     </section>
 
-    <!-- TABLE 5: BY INDUSTRY (partially dynamic, partially TODO) -->
-    <!-- TODO: Replace placeholder rows with real industry recommendations for your niche -->
+    <!-- TABLE 5: BY INDUSTRY -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Best {NICHE.label} {NICHE.providersLabel} by industry</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: most firms serve multiple industries, but each has a track record that skews toward specific verticals.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Best {NICHE.label} {NICHE.providersLabel} by industry</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: most firms serve multiple industries, but each has a track record that skews toward specific verticals.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Industry</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Recommended {NICHE.providerLabel}</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Reason</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Industry</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Recommended {NICHE.providerLabel}</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Reason</th>
             </tr>
           </thead>
           <tbody>
             {companies.slice(0, 6).map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/50' : ''}`}>
-                <td class="px-4 py-3 font-medium text-slate-800">{c.industries[0] ?? 'TODO'}</td>
-                <td class="px-4 py-3"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                <td class="px-4 py-3 text-slate-600">{c.primaryDifferentiator}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/50' : ''}`}>
+                <td class="px-4 py-3 font-medium text-zinc-100">{c.industries[0] ?? 'TODO'}</td>
+                <td class="px-4 py-3"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                <td class="px-4 py-3 text-zinc-300">{c.primaryDifferentiator}</td>
               </tr>
             ))}
           </tbody>
@@ -488,31 +468,30 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- TABLE 12: INDUSTRY FOCUS MATRIX (data-driven) -->
-    <!-- TODO: Update the industry column keys/labels to match your niche's common verticals -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Which {NICHE.label} {NICHE.providersLabel} serve which industries?</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: most firms cover multiple industries. Use this table to filter by your vertical.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Which {NICHE.label} {NICHE.providersLabel} serve which industries?</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: most firms cover multiple industries. Use this table to filter by your vertical.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">SaaS</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">Healthcare</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">Fintech</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">E-commerce</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">Enterprise</th>
-              <th class="text-center px-3 py-3 font-semibold text-slate-700 whitespace-nowrap">Logistics</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Financial services</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Healthcare</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Manufacturing</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Retail</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Government</th>
+              <th class="text-center px-3 py-3 font-semibold text-zinc-200 whitespace-nowrap">Telecom</th>
             </tr>
           </thead>
           <tbody>
             {companies.map((c, i) => {
               const inInd = (k: string) => c.industries.some(ind => ind.toLowerCase().includes(k.toLowerCase()));
               return (
-                <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                  <td class="px-4 py-3 font-semibold whitespace-nowrap"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                  {[['saas','SaaS'],['health','Healthcare'],['fintech','Fintech'],['commerce','E-commerce'],['financial','Enterprise'],['logistics','Logistics']].map(([key]) => (
-                    <td class={`px-3 py-3 text-center font-semibold ${inInd(key) ? 'text-green-600' : 'text-slate-300'}`}>{inInd(key) ? '✓' : '–'}</td>
+                <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                  <td class="px-4 py-3 font-semibold whitespace-nowrap"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                  {[['financial','Financial services'],['health','Healthcare'],['manufactur','Manufacturing'],['retail','Retail'],['govern','Government'],['telecom','Telecom']].map(([key]) => (
+                    <td class={`px-3 py-3 text-center font-semibold ${inInd(key) ? 'text-green-400' : 'text-zinc-600'}`}>{inInd(key) ? '✓' : '–'}</td>
                   ))}
                 </tr>
               );
@@ -523,23 +502,22 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- TABLE 15: CAPABILITIES BY COMPANY (data-driven) -->
-    <!-- TODO: Update badge filter keywords and column headers to match your niche's capabilities -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-2">Service capabilities by {NICHE.providerLabel}</h2>
-      <p class="text-slate-600 mb-6 text-sm">Short answer: check this table to confirm a {NICHE.providerLabel} covers your required capability before shortlisting.</p>
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 class="text-2xl font-bold text-zinc-50 mb-2">Service capabilities by {NICHE.providerLabel}</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Short answer: check this table to confirm a {NICHE.providerLabel} covers your required capability before shortlisting.</p>
+      <div class="overflow-x-auto rounded-xl border border-zinc-700">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Company</th>
-              <th class="text-left px-4 py-3 font-semibold text-slate-700">Service badges</th>
+            <tr class="bg-zinc-900 border-b border-zinc-700">
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Company</th>
+              <th class="text-left px-4 py-3 font-semibold text-zinc-200">Service badges</th>
             </tr>
           </thead>
           <tbody>
             {companies.map((c, i) => (
-              <tr class={`border-b border-slate-100 hover:bg-slate-50 ${i % 2 === 1 ? 'bg-slate-50/40' : ''}`}>
-                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-600 hover:underline">{c.name}</a></td>
-                <td class="px-4 py-3 text-slate-600">{c.badges.join(', ')}</td>
+              <tr class={`border-b border-zinc-800 hover:bg-zinc-900 ${i % 2 === 1 ? 'bg-zinc-900/40' : ''}`}>
+                <td class="px-4 py-3 font-semibold"><a href={`/companies/${c.slug}/`} class="text-brand-400 hover:underline">{c.name}</a></td>
+                <td class="px-4 py-3 text-zinc-300">{c.badges.map(b => SERVICE_LABELS[b] ?? b).join(', ')}</td>
               </tr>
             ))}
           </tbody>
@@ -548,70 +526,67 @@ const allEngagementModels = [...new Set(companies.flatMap(c => c.engagementModel
     </section>
 
     <!-- SEO PROSE 3: HOW THIS LIST WAS COMPILED -->
-    <!-- TODO — MUST REWRITE, same rule as SEO PROSE 1 above: this reads as
-         finished copy but is generic-niche boilerplate. -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">How this list was compiled</h2>
-      <div class="prose-custom max-w-none text-sm text-slate-700 space-y-4">
-        <p>All company data was sourced from each company's own website, LinkedIn profile, and third-party review platforms where available. No company paid to be included. The shortlist was built by searching for firms with verifiable {NICHE.label} delivery experience, named case studies or client references, and a disclosed technical stack that goes beyond generic claims.</p>
-        <p>The editorial criteria applied were: specialisation maturity (is {NICHE.label} the firm's core business or a side practice added recently?), technical specificity (named tools and techniques rather than generic references), named case studies in production deployments, engagement model transparency, and minimum project size accessibility. Firms with no verifiable {NICHE.label} delivery track record were excluded regardless of size or brand recognition.</p>
-        <p>Ratings are editorial, not aggregated from a third-party review platform. They reflect suitability for the {NICHE.label} use case specifically, not overall service quality. Verify all details directly with each {NICHE.providerLabel} before making a procurement decision.</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">How this list was compiled</h2>
+      <div class="prose-custom max-w-none text-sm text-zinc-200 space-y-4">
+        <p>Every entry was researched independently from each company's own website, LinkedIn profile, and, for the largest firms, public financial disclosures. No company paid for inclusion or for placement. The shortlist was built to include both dedicated AI consultancies and the AI practices of larger, established consulting and engineering firms, since both categories compete for the same buyer decision in practice.</p>
+        <p>The editorial criteria applied were advisory independence (evidence of recommending against a project, not just for one), documented methodology, strategy-to-build continuity, named enterprise engagements, and engagement transparency. Firms with no verifiable AI consulting track record, or whose "consulting" offering turned out to be a thin wrapper around a fixed build package, were excluded regardless of brand size.</p>
+        <p>Ratings are editorial and specific to AI consulting suitability on this list, not an aggregate of third-party review scores and not a measure of general company quality. Team size and reported headcount figures are drawn from LinkedIn and each firm's own disclosures and can vary across public sources for large multinationals; verify current figures directly with each firm before a procurement decision.</p>
       </div>
     </section>
 
     <!-- FAQ -->
-    <!-- TODO: Replace each FAQ item with questions specific to your niche -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-8">Frequently asked questions</h2>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-8">Frequently asked questions</h2>
       <div class="space-y-6">
-        <div class="border-b border-slate-100 pb-6">
-          <h3 class="font-semibold text-slate-900 mb-2">What is a {NICHE.label} {NICHE.providerLabel}?</h3>
-          <p class="text-sm text-slate-600">TODO: Add a definition of what {NICHE.label} {NICHE.providersLabel} do, their core value proposition, and how they differ from generalist alternatives.</p>
+        <div class="border-b border-zinc-800 pb-6">
+          <h3 class="font-semibold text-zinc-50 mb-2">What does an AI consulting company actually deliver?</h3>
+          <p class="text-sm text-zinc-300">A prioritized, tested set of recommendations for where AI can return more than it costs, usually including a readiness assessment of your data and systems, a shortlist of viable use cases, and either a technical roadmap or a working pilot. It is not the same engagement as hiring a development team to build a specific application from a spec you already have.</p>
         </div>
-        <div class="border-b border-slate-100 pb-6">
-          <h3 class="font-semibold text-slate-900 mb-2">How much does {NICHE.label} cost?</h3>
-          <p class="text-sm text-slate-600">TODO: Add pricing context for your niche. Include typical ranges for different engagement models and project types.</p>
+        <div class="border-b border-zinc-800 pb-6">
+          <h3 class="font-semibold text-zinc-50 mb-2">How much does AI consulting cost?</h3>
+          <p class="text-sm text-zinc-300">A standalone strategy or readiness assessment typically runs $15K to $60K over three to eight weeks. Ongoing advisory work runs $8K to $30K per month on retainer. Firms that hand off directly into a dedicated build team charge separately for that phase, usually $10K to $25K per engineer per month.</p>
         </div>
-        <div class="border-b border-slate-100 pb-6">
-          <h3 class="font-semibold text-slate-900 mb-2">How do I choose the right {NICHE.label} {NICHE.providerLabel}?</h3>
-          <p class="text-sm text-slate-600">TODO: Add evaluation criteria specific to your niche. What questions should buyers ask before hiring?</p>
+        <div class="border-b border-zinc-800 pb-6">
+          <h3 class="font-semibold text-zinc-50 mb-2">How do I choose the right AI consulting company?</h3>
+          <p class="text-sm text-zinc-300">Check for advisory independence (has the firm ever recommended against a project?), a documented and repeatable methodology rather than an ad hoc proposal, named enterprise engagements you can verify, and a clear plan for how strategy work connects to implementation. See the comparison table above for how each firm on this list scores against those criteria.</p>
         </div>
-        <div class="border-b border-slate-100 pb-6">
-          <h3 class="font-semibold text-slate-900 mb-2">How long does a typical {NICHE.label} project take?</h3>
-          <p class="text-sm text-slate-600">TODO: Add typical timelines for projects in your niche, broken down by project type or complexity.</p>
+        <div class="border-b border-zinc-800 pb-6">
+          <h3 class="font-semibold text-zinc-50 mb-2">Is a Big Four or global consultancy better than a boutique AI consulting firm?</h3>
+          <p class="text-sm text-zinc-300">Neither is categorically better. Large consultancies bring scale, existing enterprise relationships, and dedicated technical arms with real engineering depth. Boutique firms tend to move faster, cost less, and, if they have no separate implementation business to protect, can give more candid advice about whether a project is worth doing at all.</p>
         </div>
         <div class="pb-6">
-          <h3 class="font-semibold text-slate-900 mb-2">What is the best {NICHE.label} {NICHE.providerLabel} for startups?</h3>
-          <p class="text-sm text-slate-600">TODO: Add startup-specific recommendations. Check the minimum engagement table above and recommend the most accessible {NICHE.providersLabel} for limited budgets.</p>
+          <h3 class="font-semibold text-zinc-50 mb-2">What is the best AI consulting company for a startup budget?</h3>
+          <p class="text-sm text-zinc-300">Smaller, founder-led firms with team sizes under 50 tend to price strategy engagements for startup budgets rather than enterprise ones. Check the minimum engagement table above; firms like SoftKraft and DataRoot Labs are built specifically for startup-stage clients rather than Fortune 500 procurement cycles.</p>
         </div>
       </div>
     </section>
 
     <!-- COMPARISONS GRID (data-driven) -->
     <section id="comparisons" class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">Compare {NICHE.label} {NICHE.providersLabel}</h2>
-      <p class="text-slate-600 mb-6 text-sm">Each comparison page provides a side-by-side analysis of two {NICHE.providersLabel} across pricing, tech stack, services, and use case fit. {comparisons.length} total comparison pages available.</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">Compare {NICHE.label} {NICHE.providersLabel}</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Each comparison page provides a side-by-side analysis of two {NICHE.providersLabel} across pricing, tech stack, services, and use case fit. {comparisons.length} total comparison pages available.</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {comparisons.slice(0, 20).map(c => {
           const c1 = companies.find(co => co.slug === c.slug1)!;
           const c2 = companies.find(co => co.slug === c.slug2)!;
           return (
-            <a href={`/comparisons/${c.slug}/`} class="border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-colors">
+            <a href={`/comparisons/${c.slug}/`} class="border border-zinc-700 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-200 hover:border-brand-800 hover:text-brand-400 hover:bg-brand-900/30 transition-colors">
               {c1.name} vs {c2.name}
             </a>
           );
         })}
       </div>
-      <p class="text-slate-500 text-xs mt-4">Additional comparisons for all {companies.length} {NICHE.providersLabel} are accessible via each profile page.</p>
+      <p class="text-zinc-400 text-xs mt-4">Additional comparisons for all {companies.length} {NICHE.providersLabel} are accessible via each profile page.</p>
     </section>
 
     <!-- ALTERNATIVES GRID (data-driven) -->
     <section class="mb-14">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">Alternatives</h2>
-      <p class="text-slate-600 mb-6 text-sm">Looking for alternatives to a specific {NICHE.providerLabel}? Each alternatives page lists ranked alternatives covering all {companies.length} {NICHE.providersLabel} in this review.</p>
+      <h2 class="text-2xl font-bold text-zinc-50 mb-4">Alternatives</h2>
+      <p class="text-zinc-300 mb-6 text-sm">Looking for alternatives to a specific {NICHE.providerLabel}? Each alternatives page lists ranked alternatives covering all {companies.length} {NICHE.providersLabel} in this review.</p>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {companies.map(c => (
-          <a href={`/alternatives/${c.slug}/`} class="border border-slate-200 rounded-lg px-3 py-2.5 text-xs font-medium text-slate-700 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-colors">
+          <a href={`/alternatives/${c.slug}/`} class="border border-zinc-700 rounded-lg px-3 py-2.5 text-xs font-medium text-zinc-200 hover:border-brand-800 hover:text-brand-400 hover:bg-brand-900/30 transition-colors">
             {c.name} alternatives
           </a>
         ))}
