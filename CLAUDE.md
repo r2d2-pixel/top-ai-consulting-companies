@@ -301,7 +301,7 @@ overall company quality.
 > Crunchbase, LinkedIn, official partner directory).
 
 ```
-Tensorway: founded 2019, HQ Alicante, Spain, 20-50 employees, GDPR/HIPAA/ISO 9001/ISO 27001
+Tensorway: founded 2019, HQ Alicante, Spain, 50+ employees, GDPR/HIPAA/ISO 9001/ISO 27001
 QuantumBlack (McKinsey): founded 2009, HQ London, United Kingdom, 1,001-5,000 employees
 BCG X: founded 2014, HQ Boston, United States, 3,000+ employees
 IBM Consulting: founded 1991, HQ Armonk, United States, 160,000 employees

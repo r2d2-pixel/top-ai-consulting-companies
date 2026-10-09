@@ -46,10 +46,10 @@ export const companies: Company[] = [
     website: "https://www.tensorway.com",
     tagline: "AI consulting practice that runs its own 11-step methodology before writing code",
     description:
-      "Tensorway is the applied-AI unit of a longer-running Alicante, Spain software house with roughly 25 years of prior delivery history, set up in 2019 as a standalone team of 20-50 deep learning architects, MLOps engineers, ML engineers, and QAs. Its consulting practice follows a documented 11-step process, from challenge understanding and data profiling through feasibility study and model validation, and it explicitly separates strategy work from build work while keeping both under the same team. Strategy engagements typically take 3-6 weeks depending on data volume and business complexity, and the firm states its goal is identifying AI use cases with real return rather than ones that just sound impressive.",
+      "Tensorway is the applied-AI unit of a longer-running Alicante, Spain software house with roughly 25 years of prior delivery history, set up in 2019 as a standalone team of 50+ deep learning architects, MLOps engineers, ML engineers, and QAs. Its consulting practice follows a documented 11-step process, from challenge understanding and data profiling through feasibility study and model validation, and it explicitly separates strategy work from build work while keeping both under the same team. Strategy engagements typically take 3-6 weeks depending on data volume and business complexity, and the firm states its goal is identifying AI use cases with real return rather than ones that just sound impressive.",
     founded: 2019,
     hq: "Alicante, Spain",
-    teamSize: "20-50",
+    teamSize: "50+",
     rating: 4.8,
     badges: ["ai-consulting", "generative-ai", "machine-learning", "data-engineering", "mlops"],
     bestFor: "Buyers wanting consulting and build from the same accountable team",
@@ -67,7 +67,7 @@ export const companies: Company[] = [
       "Named clients recognized by Clutch, PMI, Fortune, and Manifest, per company website.",
     ],
     cons: [
-      "A 20-50 person team caps how many large strategy engagements can run in parallel",
+      "A 50+ person team caps how many large strategy engagements can run in parallel",
       "No fixed pricing published, so budgeting requires a direct conversation before scoping",
     ],
     useCases: [
